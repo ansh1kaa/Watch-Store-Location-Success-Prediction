@@ -1,29 +1,11 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "api/predict.py",
-      "use": "@vercel/python",
-      "config": {
-        "includeFiles": [
-          "models/**",
-          "src/**"
-        ]
-      }
-    },
-    {
-      "src": "index.html",
-      "use": "@vercel/static"
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "api/predict.py": {
+      "includeFiles": [
+        "models/trained_models.pkl",
+        "src/**"
+      ]
     }
-  ],
-  "routes": [
-    {
-      "src": "/api/predict(.*)",
-      "dest": "/api/predict.py"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
-  ]
+  }
 }
