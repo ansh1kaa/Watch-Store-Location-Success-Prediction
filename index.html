@@ -184,6 +184,8 @@
 
         .nav-links a:hover { color: var(--text-primary); }
         .nav-links a:hover::after { width: 100%; }
+        .nav-links a.active { color: var(--text-primary); }
+        .nav-links a.active::after { width: 100%; background: var(--cyan-400); }
 
         .btn-nav-cta {
             background: linear-gradient(135deg, var(--primary-600), var(--primary-500));
@@ -551,6 +553,113 @@
            ANALYSIS FORM
            ================================================================ */
         .analysis-area { padding: 2rem 0 5rem; }
+
+        /* ---- Single location search ---- */
+        .location-search-wrap {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius-xl);
+            padding: 2rem 2rem 1.5rem;
+            margin-bottom: 1.5rem;
+            backdrop-filter: blur(16px);
+            transition: border-color 0.3s;
+        }
+        .location-search-wrap:hover { border-color: rgba(99, 102, 241, 0.25); }
+
+        .location-search-label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .location-search-row { margin-bottom: 1rem; }
+
+        .location-input-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .location-pin-icon {
+            position: absolute;
+            left: 1rem;
+            width: 18px; height: 18px;
+            color: var(--primary-400);
+            pointer-events: none;
+            flex-shrink: 0;
+        }
+
+        #location-input {
+            background: var(--bg-input);
+            border: 1.5px solid var(--border-input);
+            color: var(--text-primary);
+            padding: 0.9rem 1rem 0.9rem 2.85rem;
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            width: 100%;
+        }
+
+        #location-input:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.15);
+        }
+
+        #location-input::placeholder { color: var(--text-dim); }
+
+        .location-hint {
+            font-size: 0.775rem;
+            color: var(--text-muted);
+            margin-bottom: 0.85rem;
+        }
+
+        .city-pills {
+            display: inline-block;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            color: var(--primary-300);
+            padding: 0.15rem 0.6rem;
+            border-radius: var(--radius-full);
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin: 0.15rem 0.1rem;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .city-pills:hover { background: rgba(99, 102, 241, 0.2); border-color: rgba(99, 102, 241, 0.4); }
+
+        .synthetic-note {
+            font-size: 0.725rem;
+            color: var(--warning-400);
+            background: rgba(251, 191, 36, 0.06);
+            border: 1px solid rgba(251, 191, 36, 0.15);
+            border-radius: var(--radius-sm);
+            padding: 0.5rem 0.8rem;
+        }
+
+        /* Profile grid in results */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 0.6rem;
+            margin-top: 0.75rem;
+        }
+
+        .profile-item {
+            background: rgba(10, 15, 30, 0.6);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            padding: 0.5rem 0.75rem;
+            font-size: 0.75rem;
+        }
+        .profile-item .pi-key { color: var(--text-muted); display: block; margin-bottom: 0.15rem; }
+        .profile-item .pi-val { color: var(--text-primary); font-weight: 700; }
 
         .input-cards-grid {
             display: grid;
@@ -1283,113 +1392,26 @@
             <div class="section-header reveal">
                 <div class="section-label">Analysis Tool</div>
                 <h2 class="section-title">Analyze a Location</h2>
-                <p class="section-desc">Enter the characteristics of your proposed location and let the model estimate its profitability potential.</p>
+                <p class="section-desc">Enter a city name to get an ML-based profitability estimate using a synthetic academic location profile.</p>
             </div>
 
             <div class="error-banner" id="error-banner"></div>
 
             <form id="location-form">
-                <div class="input-cards-grid">
-
-                    <!-- Card 1: Demographics -->
-                    <div class="input-card reveal">
-                        <div class="input-card-header">
-                            <div class="card-icon-box demographics">&#x1F465;</div>
-                            DEMOGRAPHICS
-                        </div>
-                        <div class="fields-row">
-                            <div class="field">
-                                <label for="population">Population (5km)</label>
-                                <input type="number" id="population" value="180000" placeholder="e.g. 180000" required>
-                                <span class="field-hint">Local population within 5km</span>
-                            </div>
-                            <div class="field">
-                                <label for="average_monthly_income">Avg Monthly Income ($)</label>
-                                <input type="number" step="0.01" id="average_monthly_income" value="6500.00" placeholder="e.g. 6500" required>
-                                <span class="field-hint">Average household income</span>
-                            </div>
-                            <div class="field field-full">
-                                <label for="target_age_group_score">Target Age Group Score (1-10)</label>
-                                <input type="number" step="0.1" id="target_age_group_score" value="7.5" min="1" max="10" placeholder="7.5" required>
-                                <span class="field-hint">Demographic alignment for target buyer age</span>
-                            </div>
+                <!-- Single Location Search Input -->
+                <div class="location-search-wrap reveal">
+                    <label class="location-search-label" for="location-input">City / Location</label>
+                    <div class="location-search-row">
+                        <div class="location-input-wrap">
+                            <svg class="location-pin-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                            <input type="text" id="location-input" placeholder="Enter city/location, e.g. Indore" autocomplete="off" list="city-suggestions">
+                            <datalist id="city-suggestions">
+                                <option value="Indore"><option value="Bhopal"><option value="Delhi"><option value="Mumbai"><option value="Jaipur"><option value="Pune"><option value="Gwalior">
+                            </datalist>
                         </div>
                     </div>
-
-                    <!-- Card 2: Foot Traffic & Retail -->
-                    <div class="input-card reveal">
-                        <div class="input-card-header">
-                            <div class="card-icon-box retail">&#x1F3EC;</div>
-                            FOOT TRAFFIC &amp; RETAIL
-                        </div>
-                        <div class="fields-row">
-                            <div class="field">
-                                <label for="daily_foot_traffic">Daily Foot Traffic</label>
-                                <input type="number" id="daily_foot_traffic" value="14000" placeholder="e.g. 14000" required>
-                                <span class="field-hint">Pedestrian traffic per day</span>
-                            </div>
-                            <div class="field">
-                                <label for="distance_to_mall_km">Dist. to Mall (km)</label>
-                                <input type="number" step="0.1" id="distance_to_mall_km" value="1.2" placeholder="e.g. 1.2" required>
-                                <span class="field-hint">Distance to nearest mall</span>
-                            </div>
-                            <div class="field">
-                                <label for="nearby_retail_stores">Nearby Retail Stores</label>
-                                <input type="number" id="nearby_retail_stores" value="45" placeholder="e.g. 45" required>
-                                <span class="field-hint">Complementary stores nearby</span>
-                            </div>
-                            <div class="field">
-                                <label for="estimated_monthly_customers">Est. Monthly Customers</label>
-                                <input type="number" id="estimated_monthly_customers" value="1200" placeholder="e.g. 1200" required>
-                                <span class="field-hint">Projected store visitors</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Card 3: Competition & Demand -->
-                    <div class="input-card reveal">
-                        <div class="input-card-header">
-                            <div class="card-icon-box competition">&#x26A1;</div>
-                            COMPETITION &amp; DEMAND
-                        </div>
-                        <div class="fields-row">
-                            <div class="field">
-                                <label for="nearby_competitors">Nearby Competitors</label>
-                                <input type="number" id="nearby_competitors" value="3" placeholder="e.g. 3" required>
-                                <span class="field-hint">Watch stores within 3km</span>
-                            </div>
-                            <div class="field">
-                                <label for="local_demand_score">Local Demand Score (1-10)</label>
-                                <input type="number" step="0.1" id="local_demand_score" value="8.2" min="1" max="10" placeholder="8.2" required>
-                                <span class="field-hint">Demand index for fashion watches</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Card 4: Operating Costs -->
-                    <div class="input-card reveal">
-                        <div class="input-card-header">
-                            <div class="card-icon-box costs">&#x1F4B5;</div>
-                            OPERATING COSTS &amp; PRICING
-                        </div>
-                        <div class="fields-row">
-                            <div class="field">
-                                <label for="monthly_rent">Monthly Rent ($)</label>
-                                <input type="number" step="0.01" id="monthly_rent" value="6500.00" placeholder="e.g. 6500" required>
-                                <span class="field-hint">Monthly store lease</span>
-                            </div>
-                            <div class="field">
-                                <label for="monthly_operating_cost">Operating Cost ($)</label>
-                                <input type="number" step="0.01" id="monthly_operating_cost" value="7500.00" placeholder="e.g. 7500" required>
-                                <span class="field-hint">Non-rent monthly overhead</span>
-                            </div>
-                            <div class="field field-full">
-                                <label for="average_purchase_value">Avg Purchase Value ($)</label>
-                                <input type="number" step="0.01" id="average_purchase_value" value="320.00" placeholder="e.g. 320" required>
-                                <span class="field-hint">Expected average transaction</span>
-                            </div>
-                        </div>
-                    </div>
+                    <p class="location-hint">Supported cities: <span class="city-pills">Indore</span> <span class="city-pills">Bhopal</span> <span class="city-pills">Delhi</span> <span class="city-pills">Mumbai</span> <span class="city-pills">Jaipur</span> <span class="city-pills">Pune</span> <span class="city-pills">Gwalior</span></p>
+                    <p class="synthetic-note">&#x26A0;&#xFE0F; All city profiles are <strong>synthetic academic profiles</strong> created for ML evaluation practice. They do not represent real business data.</p>
                 </div>
 
                 <!-- Model Selector -->
@@ -1502,6 +1524,12 @@
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Synthetic Location Profile -->
+                <div class="summary-block" id="profile-block" style="display:none;">
+                    <div class="summary-title">Resolved Synthetic Location Profile <span style="font-size:0.7rem;font-weight:400;color:var(--text-dim);">(Academic — not real-world data)</span></div>
+                    <div class="profile-grid" id="res-profile"></div>
                 </div>
 
                 <!-- Summary -->
@@ -1695,10 +1723,47 @@
         }
 
         /* ----------------------------------------------------------
-           Mobile Nav Toggle
+           Mobile Nav Toggle + close on link click
            ---------------------------------------------------------- */
         document.getElementById('nav-toggle').addEventListener('click', function () {
             document.getElementById('nav-links').classList.toggle('open');
+        });
+
+        document.querySelectorAll('#nav-links a').forEach(function(link) {
+            link.addEventListener('click', function() {
+                document.getElementById('nav-links').classList.remove('open');
+            });
+        });
+
+        /* ----------------------------------------------------------
+           Active Nav Scroll Spy
+           ---------------------------------------------------------- */
+        (function() {
+            const sections = ['home', 'how-it-works', 'analyze', 'scenarios', 'compare'];
+            const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+            function updateActive() {
+                let current = '';
+                sections.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (!el) return;
+                    const rect = el.getBoundingClientRect();
+                    if (rect.top <= 100) current = id;
+                });
+                navLinks.forEach(link => {
+                    const href = link.getAttribute('href').replace('#', '');
+                    link.classList.toggle('active', href === current);
+                });
+            }
+            window.addEventListener('scroll', updateActive, { passive: true });
+            updateActive();
+        })();
+
+        /* City-pill quick fill */
+        document.querySelectorAll('.city-pills').forEach(function(pill) {
+            pill.addEventListener('click', function() {
+                document.getElementById('location-input').value = pill.textContent.trim();
+                document.getElementById('location-input').focus();
+            });
         });
 
         /* ----------------------------------------------------------
@@ -1718,11 +1783,17 @@
         }
 
         /* ----------------------------------------------------------
-           Form Submission — Predict
+           Form Submission — Predict by Location Name
            ---------------------------------------------------------- */
         document.getElementById('location-form').addEventListener('submit', async function (e) {
             e.preventDefault();
             clearError();
+
+            const cityRaw = document.getElementById('location-input').value.trim();
+            if (!cityRaw) {
+                showError('Please enter a city / location name.');
+                return;
+            }
 
             const btn = document.getElementById('btn-submit');
             const spinner = document.getElementById('btn-spinner');
@@ -1730,29 +1801,14 @@
             btn.disabled = true;
             spinner.style.display = 'inline-block';
 
-            const locationData = {
-                population: parseInt(document.getElementById('population').value, 10),
-                average_monthly_income: parseFloat(document.getElementById('average_monthly_income').value),
-                daily_foot_traffic: parseInt(document.getElementById('daily_foot_traffic').value, 10),
-                nearby_competitors: parseInt(document.getElementById('nearby_competitors').value, 10),
-                monthly_rent: parseFloat(document.getElementById('monthly_rent').value),
-                distance_to_mall_km: parseFloat(document.getElementById('distance_to_mall_km').value),
-                nearby_retail_stores: parseInt(document.getElementById('nearby_retail_stores').value, 10),
-                estimated_monthly_customers: parseInt(document.getElementById('estimated_monthly_customers').value, 10),
-                average_purchase_value: parseFloat(document.getElementById('average_purchase_value').value),
-                monthly_operating_cost: parseFloat(document.getElementById('monthly_operating_cost').value),
-                local_demand_score: parseFloat(document.getElementById('local_demand_score').value),
-                target_age_group_score: parseFloat(document.getElementById('target_age_group_score').value)
-            };
-
             try {
                 const response = await fetch('/api/predict', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        action: 'predict',
+                        action: 'predict_location',
                         model_type: selectedModel,
-                        location_data: locationData
+                        location: cityRaw
                     })
                 });
 
@@ -1763,11 +1819,14 @@
                     data = await response.json();
                 } else {
                     const text = await response.text();
-                    throw new Error('Server returned unexpected response: ' + text.substring(0, 120));
+                    throw new Error('Server returned unexpected response: ' + text.substring(0, 200));
                 }
 
                 if (response.ok && data.success !== false) {
-                    renderResults(data, locationData);
+                    // Use resolved profile for business insight rendering
+                    const profile = data.location_profile || {};
+                    renderResults(data, profile);
+                    renderProfile(profile, data.location_name || cityRaw);
                     document.getElementById('results').style.display = 'block';
                     document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
                 } else {
@@ -1857,6 +1916,37 @@
 
             // Summary
             document.getElementById('res-summary').textContent = data.summary_text || '';
+        }
+
+        /* ----------------------------------------------------------
+           Render Profile Block
+           ---------------------------------------------------------- */
+        function renderProfile(profile, cityName) {
+            const block = document.getElementById('profile-block');
+            const grid = document.getElementById('res-profile');
+            if (!block || !grid || !profile || Object.keys(profile).length === 0) return;
+            const labels = {
+                population: 'Population',
+                average_monthly_income: 'Avg Monthly Income',
+                daily_foot_traffic: 'Daily Foot Traffic',
+                nearby_competitors: 'Nearby Competitors',
+                monthly_rent: 'Monthly Rent',
+                distance_to_mall_km: 'Dist. to Mall (km)',
+                nearby_retail_stores: 'Nearby Retail Stores',
+                estimated_monthly_customers: 'Est. Monthly Customers',
+                average_purchase_value: 'Avg Purchase Value',
+                monthly_operating_cost: 'Operating Cost',
+                local_demand_score: 'Demand Score',
+                target_age_group_score: 'Age Group Score'
+            };
+            grid.innerHTML = Object.entries(labels).map(([k, label]) => {
+                const v = profile[k];
+                const disp = (v === undefined || v === null) ? '—'
+                    : (typeof v === 'number' && !Number.isInteger(v)) ? v.toFixed(2)
+                    : String(v).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                return `<div class="profile-item"><span class="pi-key">${label}</span><span class="pi-val">${disp}</span></div>`;
+            }).join('');
+            block.style.display = 'block';
         }
 
         function colorizeInsight(id, level) {

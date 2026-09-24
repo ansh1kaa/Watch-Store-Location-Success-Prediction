@@ -3,6 +3,7 @@ Vercel Serverless API Handler for Watch Store Location Success Prediction
 Pure Python HTTP Handler (No Flask / Django / Node.js needed).
 Guarantees structured JSON output for both successful predictions and error handling.
 Validates all inputs server-side with zero external stack-trace or path exposure.
+Supports single-city name lookups mapped to synthetic academic location profiles.
 """
 
 from http.server import BaseHTTPRequestHandler
@@ -54,6 +55,137 @@ def _load_predict_module():
         return None
 
 predict_module = _load_predict_module()
+
+
+# Synthetic Academic Location Profiles
+SYNTHETIC_CITY_PROFILES = {
+    'indore': {
+        'name': 'Indore',
+        'tagline': 'Commercial & Trade Hub (MG Road / Chappan Catchment)',
+        'features': {
+            'population': 280000,
+            'average_monthly_income': 7200.0,
+            'daily_foot_traffic': 15500,
+            'nearby_competitors': 5,
+            'monthly_rent': 9200.0,
+            'distance_to_mall_km': 1.1,
+            'nearby_retail_stores': 85,
+            'estimated_monthly_customers': 2000,
+            'average_purchase_value': 310.0,
+            'monthly_operating_cost': 12500.0,
+            'local_demand_score': 8.2,
+            'target_age_group_score': 7.6
+        }
+    },
+    'gwalior': {
+        'name': 'Gwalior',
+        'tagline': 'Outskirts Corridor (Low Traffic / High Rent Ratio)',
+        'features': {
+            'population': 95000,
+            'average_monthly_income': 3400.0,
+            'daily_foot_traffic': 3200,
+            'nearby_competitors': 10,
+            'monthly_rent': 9800.0,
+            'distance_to_mall_km': 11.5,
+            'nearby_retail_stores': 18,
+            'estimated_monthly_customers': 450,
+            'average_purchase_value': 140.0,
+            'monthly_operating_cost': 11200.0,
+            'local_demand_score': 3.5,
+            'target_age_group_score': 3.8
+        }
+    },
+    'delhi': {
+        'name': 'Delhi',
+        'tagline': 'Connaught Place / Prime Central Trade Area',
+        'features': {
+            'population': 420000,
+            'average_monthly_income': 10200.0,
+            'daily_foot_traffic': 23500,
+            'nearby_competitors': 8,
+            'monthly_rent': 15500.0,
+            'distance_to_mall_km': 0.4,
+            'nearby_retail_stores': 135,
+            'estimated_monthly_customers': 3100,
+            'average_purchase_value': 480.0,
+            'monthly_operating_cost': 18000.0,
+            'local_demand_score': 9.2,
+            'target_age_group_score': 9.0
+        }
+    },
+    'mumbai': {
+        'name': 'Mumbai',
+        'tagline': 'Bandra High-Street / Luxury Promenade',
+        'features': {
+            'population': 460000,
+            'average_monthly_income': 11100.0,
+            'daily_foot_traffic': 24000,
+            'nearby_competitors': 9,
+            'monthly_rent': 18500.0,
+            'distance_to_mall_km': 0.3,
+            'nearby_retail_stores': 140,
+            'estimated_monthly_customers': 3300,
+            'average_purchase_value': 520.0,
+            'monthly_operating_cost': 21000.0,
+            'local_demand_score': 9.5,
+            'target_age_group_score': 9.1
+        }
+    },
+    'bhopal': {
+        'name': 'Bhopal',
+        'tagline': 'MP Nagar Commercial Market Zone',
+        'features': {
+            'population': 210000,
+            'average_monthly_income': 6200.0,
+            'daily_foot_traffic': 12800,
+            'nearby_competitors': 5,
+            'monthly_rent': 6200.0,
+            'distance_to_mall_km': 2.1,
+            'nearby_retail_stores': 68,
+            'estimated_monthly_customers': 1650,
+            'average_purchase_value': 280.0,
+            'monthly_operating_cost': 8600.0,
+            'local_demand_score': 7.2,
+            'target_age_group_score': 7.0
+        }
+    },
+    'jaipur': {
+        'name': 'Jaipur',
+        'tagline': 'MI Road / Heritage Retail Belt',
+        'features': {
+            'population': 290000,
+            'average_monthly_income': 7400.0,
+            'daily_foot_traffic': 17200,
+            'nearby_competitors': 6,
+            'monthly_rent': 8200.0,
+            'distance_to_mall_km': 1.5,
+            'nearby_retail_stores': 95,
+            'estimated_monthly_customers': 2250,
+            'average_purchase_value': 360.0,
+            'monthly_operating_cost': 10500.0,
+            'local_demand_score': 8.1,
+            'target_age_group_score': 8.0
+        }
+    },
+    'pune': {
+        'name': 'Pune',
+        'tagline': 'FC Road / Tech Corridor Promenade',
+        'features': {
+            'population': 340000,
+            'average_monthly_income': 8900.0,
+            'daily_foot_traffic': 19500,
+            'nearby_competitors': 7,
+            'monthly_rent': 11000.0,
+            'distance_to_mall_km': 0.8,
+            'nearby_retail_stores': 110,
+            'estimated_monthly_customers': 2600,
+            'average_purchase_value': 410.0,
+            'monthly_operating_cost': 13500.0,
+            'local_demand_score': 8.7,
+            'target_age_group_score': 8.5
+        }
+    }
+}
 
 
 REQUIRED_FEATURES = [
@@ -178,12 +310,14 @@ class handler(BaseHTTPRequestHandler):
         self._set_headers(200)
 
     def do_GET(self):
+        supported = [p['name'] for p in SYNTHETIC_CITY_PROFILES.values()]
         self._send_json(200, {
             "success": True,
             "status": "online",
             "message": "Watch Store Location Success Prediction API is operational.",
             "endpoint": "/api/predict",
-            "disclosure": "Synthetic dataset created for academic machine-learning practice."
+            "supported_locations": supported,
+            "disclosure": "Synthetic academic location profiles created for ML evaluation."
         })
 
     def do_POST(self):
@@ -224,7 +358,55 @@ class handler(BaseHTTPRequestHandler):
             raw_model_type = payload.get('model_type', 'rf')
             model_type = 'lr' if str(raw_model_type).lower() in ('lr', 'logistic', 'logistic_regression') else 'rf'
 
-            if action == 'compare':
+            # 1. Location name resolution (Indore, Gwalior, Delhi, etc.)
+            if action == 'predict_location' or ('location' in payload and 'location_data' not in payload):
+                loc_raw = payload.get('location', '')
+                if not loc_raw or not isinstance(loc_raw, str):
+                    self._send_json(400, {
+                        "success": False,
+                        "error": "Please provide a valid location name (e.g. 'Indore')."
+                    })
+                    return
+
+                key = loc_raw.strip().lower()
+                if key not in SYNTHETIC_CITY_PROFILES:
+                    supported = [p['name'] for p in SYNTHETIC_CITY_PROFILES.values()]
+                    self._send_json(400, {
+                        "success": False,
+                        "error": f"Location '{loc_raw.strip()}' is not in the synthetic academic profiles. Supported locations: {', '.join(supported)}.",
+                        "supported_locations": supported
+                    })
+                    return
+
+                profile_info = SYNTHETIC_CITY_PROFILES[key]
+                canonical_name = profile_info['name']
+                location_data = profile_info['features']
+
+                pred_result = predict_module.predict_store_success(location_data, model_type=model_type)
+                fin_result = predict_module.financial_investment_calculator(location_data)
+                summary_text = predict_module.generate_business_summary(canonical_name, location_data, model_type=model_type)
+
+                response_data = {
+                    "success": True,
+                    "action": "predict_location",
+                    "location": canonical_name,
+                    "location_name": canonical_name,
+                    "tagline": profile_info.get('tagline', ''),
+                    "location_profile": location_data,
+                    "is_synthetic_profile": True,
+                    "prediction": pred_result['prediction'],
+                    "probability": round(pred_result['probability_raw'], 4),
+                    "probability_percent": pred_result['probability_percent'],
+                    "probability_raw": pred_result['probability_raw'],
+                    "label": pred_result['label'],
+                    "model_used": pred_result['model_used'],
+                    "financial_estimates": fin_result,
+                    "summary_text": summary_text
+                }
+                self._send_json(200, response_data)
+                return
+
+            elif action == 'compare':
                 locations = payload.get('locations')
                 if not locations or not isinstance(locations, dict):
                     self._send_json(400, {
