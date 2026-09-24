@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watch Store Location Success Prediction</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --input-bg: #1e293b;
+            --input-border: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+
+        body {
+            background: radial-gradient(circle at top right, #1e1b4b, #0f172a 60%);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        header h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .academic-badge {
+            display: inline-block;
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #93c5fd;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            margin-top: 0.75rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 900px) {
+            .grid {
+                grid-template-columns: 1.1fr 0.9fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-section {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-section-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #93c5fd;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 0.25rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.85rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .input-group label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .input-group input, .input-group select {
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            color: var(--text-main);
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            border-color: var(--primary);
+        }
+
+        .btn-predict {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+            color: white;
+            border: none;
+            padding: 0.85rem;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+            margin-top: 1rem;
+        }
+
+        .btn-predict:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.4);
+        }
+
+        .results-empty {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-muted);
+        }
+
+        .status-badge {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .status-profitable {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.3));
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #34d399;
+        }
+
+        .status-not-profitable {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.3));
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #f87171;
+        }
+
+        .metric-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--input-border);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .metric-value {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: #60a5fa;
+        }
+
+        .metric-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .fin-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .fin-box {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid var(--input-border);
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+        }
+
+        .fin-box-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .fin-box-val {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .summary-box {
+            background: rgba(15, 23, 42, 0.8);
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            border-radius: 0 0.5rem 0.5rem 0;
+            font-family: monospace;
+            font-size: 0.8rem;
+            white-space: pre-wrap;
+            color: #cbd5e1;
+        }
+
+        .disclaimer {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 1rem;
+            text-align: center;
+            font-style: italic;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        footer a {
+            color: #60a5fa;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Watch Store Location Success Prediction</h1>
+        <p>Machine Learning Decision-Support System for Retail Store Expansion</p>
+        <div class="academic-badge">
+            Academic Disclosure: Synthetic dataset created for ML practice. Does not guarantee real-world store profitability.
+        </div>
+    </header>
+
+    <div class="grid">
+        <!-- Left Column: Input Parameters -->
+        <div class="card">
+            <div class="card-title">📍 Location & Business Parameters</div>
+            
+            <form id="prediction-form">
+                <!-- Section 1: Demographics -->
+                <div class="form-section">
+                    <div class="form-section-title">Demographics & Population</div>
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <label for="population">Population (5km)</label>
+                            <input type="number" id="population" value="180000" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="average_monthly_income">Avg Income ($)</label>
+                            <input type="number" step="0.01" id="average_monthly_income" value="6500.00" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="target_age_group_score">Target Age Score (1-10)</label>
+                            <input type="number" step="0.1" id="target_age_group_score" value="7.5" min="1" max="10" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Traffic & Retail Environment -->
+                <div class="form-section">
+                    <div class="form-section-title">Traffic & Retail Environment</div>
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <label for="daily_foot_traffic">Daily Foot Traffic</label>
+                            <input type="number" id="daily_foot_traffic" value="14000" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="distance_to_mall_km">Dist. to Mall (km)</label>
+                            <input type="number" step="0.1" id="distance_to_mall_km" value="1.2" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="nearby_retail_stores">Nearby Retail Stores</label>
+                            <input type="number" id="nearby_retail_stores" value="45" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: Competition & Demand -->
+                <div class="form-section">
+                    <div class="form-section-title">Competition & Demand</div>
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <label for="nearby_competitors">Competitors (3km)</label>
+                            <input type="number" id="nearby_competitors" value="3" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="local_demand_score">Demand Score (1-10)</label>
+                            <input type="number" step="0.1" id="local_demand_score" value="8.2" min="1" max="10" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="model_type">ML Model</label>
+                            <select id="model_type">
+                                <option value="rf" selected>Random Forest (ROC-AUC: 0.9850)</option>
+                                <option value="lr">Logistic Regression (ROC-AUC: 0.9729)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 4: Operations & Costs -->
+                <div class="form-section">
+                    <div class="form-section-title">Operations & Overhead Costs</div>
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <label for="monthly_rent">Monthly Rent ($)</label>
+                            <input type="number" step="0.01" id="monthly_rent" value="6500.00" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="monthly_operating_cost">Operating Cost ($)</label>
+                            <input type="number" step="0.01" id="monthly_operating_cost" value="7500.00" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="estimated_monthly_customers">Est. Monthly Customers</label>
+                            <input type="number" id="estimated_monthly_customers" value="1200" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="average_purchase_value">Avg Order Value ($)</label>
+                            <input type="number" step="0.01" id="average_purchase_value" value="320.00" required>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-predict" id="btn-submit">⚡ Predict Store Success</button>
+            </form>
+        </div>
+
+        <!-- Right Column: Results Output -->
+        <div class="card" id="results-panel">
+            <div class="card-title">📊 Decision Support Results</div>
+            
+            <div id="results-empty" class="results-empty">
+                <div style="font-size: 3rem; margin-bottom: 0.5rem;">🏬</div>
+                <p>Enter location metrics on the left and click <strong>Predict Store Success</strong> to run model inference.</p>
+            </div>
+
+            <div id="results-content" style="display: none;">
+                <!-- Status Badge -->
+                <div id="status-badge" class="status-badge">
+                    PROFITABLE
+                </div>
+
+                <!-- Probability Score -->
+                <div class="metric-card">
+                    <div class="metric-value" id="probability-value">93.00%</div>
+                    <div class="metric-label">Model-Estimated Probability of Profitability (<span id="model-name">Random Forest</span>)</div>
+                </div>
+
+                <!-- Financial Heuristics Grid -->
+                <div class="fin-grid">
+                    <div class="fin-box">
+                        <div class="fin-box-label">Est. Monthly Revenue</div>
+                        <div class="fin-box-val" id="fin-revenue">$38,400.00</div>
+                    </div>
+                    <div class="fin-box">
+                        <div class="fin-box-label">Total Monthly Cost</div>
+                        <div class="fin-box-val" id="fin-cost">$14,000.00</div>
+                    </div>
+                    <div class="fin-box">
+                        <div class="fin-box-label">Est. Monthly Net Profit</div>
+                        <div class="fin-box-val" id="fin-profit">$24,400.00</div>
+                    </div>
+                    <div class="fin-box">
+                        <div class="fin-box-label">Est. Break-Even Period</div>
+                        <div class="fin-box-val" id="fin-breakeven">6.1 Months</div>
+                    </div>
+                </div>
+
+                <!-- Executive Summary -->
+                <div class="summary-box" id="summary-text">
+                    Loading location assessment summary...
+                </div>
+
+                <div class="disclaimer">
+                    Note: Both the ML model probability and financial calculator are academic decision-support estimates and do not guarantee real-world commercial profitability.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        Watch Store Location Success Prediction &bull; Academic Machine Learning Project &bull; Built with Python, Pandas, & Scikit-learn
+    </footer>
+</div>
+
+<script>
+document.getElementById('prediction-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const btn = document.getElementById('btn-submit');
+    btn.innerText = '⏳ Processing Model Inference...';
+    btn.disabled = true;
+
+    const locationData = {
+        population: parseInt(document.getElementById('population').value),
+        average_monthly_income: parseFloat(document.getElementById('average_monthly_income').value),
+        daily_foot_traffic: parseInt(document.getElementById('daily_foot_traffic').value),
+        nearby_competitors: parseInt(document.getElementById('nearby_competitors').value),
+        monthly_rent: parseFloat(document.getElementById('monthly_rent').value),
+        distance_to_mall_km: parseFloat(document.getElementById('distance_to_mall_km').value),
+        nearby_retail_stores: parseInt(document.getElementById('nearby_retail_stores').value),
+        estimated_monthly_customers: parseInt(document.getElementById('estimated_monthly_customers').value),
+        average_purchase_value: parseFloat(document.getElementById('average_purchase_value').value),
+        monthly_operating_cost: parseFloat(document.getElementById('monthly_operating_cost').value),
+        local_demand_score: parseFloat(document.getElementById('local_demand_score').value),
+        target_age_group_score: parseFloat(document.getElementById('target_age_group_score').value)
+    };
+
+    const modelType = document.getElementById('model_type').value;
+
+    try {
+        const response = await fetch('/api/predict', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'predict',
+                model_type: modelType,
+                location_data: locationData
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            document.getElementById('results-empty').style.display = 'none';
+            document.getElementById('results-content').style.display = 'block';
+
+            const badge = document.getElementById('status-badge');
+            if (data.prediction === 'PROFITABLE') {
+                badge.className = 'status-badge status-profitable';
+                badge.innerText = 'PROFITABLE';
+            } else {
+                badge.className = 'status-badge status-not-profitable';
+                badge.innerText = 'NOT PROFITABLE';
+            }
+
+            document.getElementById('probability-value').innerText = data.probability_percent.toFixed(2) + '%';
+            document.getElementById('model-name').innerText = data.model_used;
+
+            const fin = data.financial_estimates;
+            document.getElementById('fin-revenue').innerText = '$' + fin.est_monthly_revenue.toLocaleString('en-US', {minimumFractionDigits: 2});
+            document.getElementById('fin-cost').innerText = '$' + fin.total_monthly_cost.toLocaleString('en-US', {minimumFractionDigits: 2});
+            document.getElementById('fin-profit').innerText = '$' + fin.est_monthly_net_profit.toLocaleString('en-US', {minimumFractionDigits: 2});
+            document.getElementById('fin-breakeven').innerText = fin.breakeven_months === Infinity ? 'N/A' : fin.breakeven_months + ' Months';
+
+            document.getElementById('summary-text').innerText = data.summary_text;
+        } else {
+            alert('API Error: ' + (data.error || 'Failed to get prediction'));
+        }
+    } catch (err) {
+        alert('Network Error: ' + err.message + '\nMake sure the local API server is running.');
+    } finally {
+        btn.innerText = '⚡ Predict Store Success';
+        btn.disabled = false;
+    }
+});
+</script>
+
+</body>
+</html>

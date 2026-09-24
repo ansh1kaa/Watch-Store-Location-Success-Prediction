@@ -17,11 +17,12 @@
 8. [Models Used](#models-used)
 9. [Evaluation Metrics & Actual Results](#evaluation-metrics--actual-results)
 10. [Model Selection Decision](#model-selection-decision)
-11. [Probability Prediction & Business Features](#probability-prediction--business-features)
+11. [Web Application & Vercel API Endpoint](#web-application--vercel-api-endpoint)
 12. [Project Structure](#project-structure)
-13. [Setup & Execution Instructions](#setup--execution-instructions)
-14. [Limitations](#limitations)
-15. [Future Improvements](#future-improvements)
+13. [Local Setup & Run Instructions](#local-setup--run-instructions)
+14. [Vercel Deployment Instructions](#vercel-deployment-instructions)
+15. [Limitations](#limitations)
+16. [Future Improvements](#future-improvements)
 
 ---
 
@@ -113,10 +114,6 @@ All evaluation metrics were calculated from model execution on the **1,000-sampl
 | **Logistic Regression** | 91.10% | 91.64% | 93.36% | 92.49% | 0.9729 |
 | **Random Forest Classifier** | **93.70%** | **94.11%** | **95.23%** | **94.67%** | **0.9850** |
 
-### Confusion Matrix Breakdown (Test Set = 1,000 samples):
-- **Logistic Regression:** `TN = 363`, `FP = 50`, `FN = 39`, `TP = 548`
-- **Random Forest Classifier:** `TN = 378`, `FP = 35`, `FN = 28`, `TP = 559`
-
 ---
 
 ## 🏆 Model Selection Decision
@@ -126,47 +123,49 @@ All evaluation metrics were calculated from model execution on the **1,000-sampl
 
 ---
 
-## 💡 Probability Prediction & Business Decision Features
+## 🌐 Web Application & Vercel API Endpoint
 
-### 1. Dynamic Probability Inference (`predict_proba`)
-```python
-from src.predict import predict_store_success
+The repository includes a minimal, Vercel-compatible web application interface (`index.html`) backed by a pure Python Serverless Function (`api/predict.py`).
 
-sample_site = {
-    'population': 180000,
-    'average_monthly_income': 6500.0,
-    'daily_foot_traffic': 14000,
-    'nearby_competitors': 3,
-    'monthly_rent': 6500.0,
-    'distance_to_mall_km': 1.2,
-    'nearby_retail_stores': 45,
-    'estimated_monthly_customers': 1200,
-    'average_purchase_value': 320.0,
-    'monthly_operating_cost': 7500.0,
-    'local_demand_score': 8.2,
-    'target_age_group_score': 7.5
+### API Endpoint (`POST /api/predict`)
+- **Request Body (JSON):**
+```json
+{
+  "action": "predict",
+  "model_type": "rf",
+  "location_data": {
+    "population": 180000,
+    "average_monthly_income": 6500.0,
+    "daily_foot_traffic": 14000,
+    "nearby_competitors": 3,
+    "monthly_rent": 6500.0,
+    "distance_to_mall_km": 1.2,
+    "nearby_retail_stores": 45,
+    "estimated_monthly_customers": 1200,
+    "average_purchase_value": 320.0,
+    "monthly_operating_cost": 7500.0,
+    "local_demand_score": 8.2,
+    "target_age_group_score": 7.5
+  }
 }
-
-result = predict_store_success(sample_site)
-# Output: Prediction: PROFITABLE | Probability of Profitability: 93.0%
 ```
-
-### 2. Multi-Site Location Ranking
-Ranks proposed expansion sites based on model-estimated profitability probability:
-1. **High-Street Pedestrian Zone:** 94.0% Probability (PROFITABLE)
-2. **Downtown Commercial Center:** 93.0% Probability (PROFITABLE)
-3. **Suburban Strip Mall:** 6.0% Probability (NOT PROFITABLE)
-
-### 3. What-If Rent Sensitivity Analysis
-Evaluates probability changes as monthly lease rent varies:
-- Rent $4,000 → 95.0% Probability (PROFITABLE)
-- Rent $6,500 → 93.0% Probability (PROFITABLE)
-- Rent $9,000 → 79.0% Probability (PROFITABLE)
-- Rent $12,000 → 41.0% Probability (NOT PROFITABLE)
-
-### 4. Separate Financial Calculator
-Calculates post-prediction financial heuristics (Projected Monthly Revenue, Costs, Profit, Break-Even period) using a 10% (0.10) effective retail margin assumption consistent with baseline synthetic economics.  
-*Note: The financial calculator is a separate post-prediction analysis tool and is never fed into the ML model as an input feature.*
+- **Response Body (JSON):**
+```json
+{
+  "prediction": "PROFITABLE",
+  "label": 1,
+  "probability_percent": 93.0,
+  "probability_raw": 0.93,
+  "model_used": "Random Forest Classifier",
+  "financial_estimates": {
+    "est_monthly_revenue": 38400.0,
+    "total_monthly_cost": 14000.0,
+    "est_monthly_net_profit": 24400.0,
+    "initial_setup_cost": 150000,
+    "breakeven_months": 6.1
+  }
+}
+```
 
 ---
 
@@ -174,22 +173,21 @@ Calculates post-prediction financial heuristics (Projected Monthly Revenue, Cost
 
 ```
 Watch-Store-Location-Success-Prediction/
-│
+├── api/
+│   └── predict.py                        # Vercel Serverless Python Handler
 ├── data/
 │   └── watch_store_locations.csv         # 5,000-record clean CSV dataset
-│
 ├── models/
 │   └── trained_models.pkl                # Serialized model artifacts & scaler
-│
 ├── notebooks/
 │   └── watch_store_location_prediction.ipynb # Executable 22-section notebook
-│
 ├── src/
 │   ├── generate_dataset.py                # Dataset generator script
 │   ├── preprocess.py                      # Quality check, scaler & stratified split
 │   ├── train_eval.py                      # Classifier training & evaluation
 │   └── predict.py                         # Probability inference & business tools
-│
+├── index.html                             # Vercel Static Web Interface
+├── vercel.json                            # Vercel configuration routing
 ├── README.md                              # Technical project documentation
 ├── requirements.txt                       # Project dependencies
 └── .gitignore                             # Git exclusion rules
@@ -197,11 +195,11 @@ Watch-Store-Location-Success-Prediction/
 
 ---
 
-## ⚡ Setup & Execution Instructions
+## ⚡ Local Setup & Run Instructions
 
 ### 1. Environment Setup
 ```bash
-git clone <repository_url>
+git clone https://github.com/ansh1kaa/Watch-Store-Location-Success-Prediction.git
 cd Watch-Store-Location-Success-Prediction
 pip install -r requirements.txt
 ```
@@ -214,25 +212,38 @@ python src/generate_dataset.py
 # Step 2: Preprocess, train models & display empirical test evaluation
 python src/train_eval.py
 
-# Step 3: Run inference demo, location comparison & business summary
+# Step 3: Run inference demo & business decision output
 python src/predict.py
 ```
 
-### 3. Running Jupyter Notebook
+### 3. Local Web Testing
+Serve static files and Python API locally using Python's HTTP server:
 ```bash
-jupyter notebook notebooks/watch_store_location_prediction.ipynb
+python -m http.server 8000
 ```
+Then navigate to `http://localhost:8000` in your web browser.
 
 ---
 
-## ⚠️ Limitations
-1. **Synthetic Dataset:** The dataset is synthetic and created for academic machine-learning practice. It does not represent actual watch-store businesses or real-world locations.
-2. **Academic Decision Support:** The model provides an academic estimate based on the generated data and should not be interpreted as a guarantee of real-world profitability.
-3. **Static Scope:** Does not capture dynamic inflation rates, local macroeconomic shifts, or multi-year competitor entry.
+## 🚀 Vercel Deployment Instructions
+
+1. **Push to GitHub:** Ensure your latest commits are pushed to `main`.
+2. **Import to Vercel:**
+   - Log in to your [Vercel Dashboard](https://vercel.com).
+   - Click **Add New** > **Project** and import `ansh1kaa/Watch-Store-Location-Success-Prediction`.
+   - Vercel automatically detects `vercel.json` and configures the static frontend and `@vercel/python` Serverless Function (`api/predict.py`).
+3. **Deploy:** Click **Deploy**. Your app and API will be live instantly!
+
+---
+
+## ⚠️ Limitations & Academic Disclaimers
+1. **Synthetic Dataset Notice:** The dataset is synthetic and created for academic machine-learning practice. It does not represent actual watch-store businesses or real-world locations.
+2. **Academic Decision Support:** Predictions are academic decision-support estimates based on synthetic data and do NOT guarantee real-world commercial profitability.
+3. **Static Scope:** Does not capture dynamic inflation rates, localized macroeconomic shifts, or multi-year competitor entry.
 
 ---
 
 ## 🔮 Future Improvements
 1. Integrate real-world GIS traffic and foot-fall API data.
 2. Add time-series forecasting for multi-year lease ROI analysis.
-3. Perform hyperparameter optimization using `GridSearchCV`.
+3. Implement hyperparameter optimization using `GridSearchCV`.
