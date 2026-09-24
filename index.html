@@ -3,520 +3,1984 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Watch Store Location Success Prediction</title>
-    <!-- Google Fonts -->
+    <title>Watch Store Location Success Prediction | AI-Powered Location Intelligence</title>
+    <meta name="description" content="Predict whether a watch store location will be profitable using machine learning. Analyze demographics, foot traffic, competition, and costs with our AI-powered tool.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
+        /* ================================================================
+           DESIGN SYSTEM — Watch Store Location AI
+           ================================================================ */
         :root {
-            --bg-dark: #0f172a;
-            --card-bg: rgba(30, 41, 59, 0.7);
-            --card-border: rgba(255, 255, 255, 0.08);
-            --primary: #3b82f6;
-            --primary-hover: #2563eb;
-            --success: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --input-bg: #1e293b;
-            --input-border: #334155;
+            --bg-body: #06080f;
+            --bg-surface: #0c1120;
+            --bg-card: rgba(14, 22, 40, 0.72);
+            --bg-card-hover: rgba(22, 34, 58, 0.85);
+            --bg-input: #0a0f1e;
+            --border-subtle: rgba(255, 255, 255, 0.06);
+            --border-card: rgba(255, 255, 255, 0.08);
+            --border-input: rgba(255, 255, 255, 0.1);
+            --border-focus: #818cf8;
+
+            /* Primary palette */
+            --primary-50: #eef2ff;
+            --primary-200: #c7d2fe;
+            --primary-300: #a5b4fc;
+            --primary-400: #818cf8;
+            --primary-500: #6366f1;
+            --primary-600: #4f46e5;
+            --primary-700: #4338ca;
+            --primary-glow: rgba(99, 102, 241, 0.3);
+
+            /* Accent */
+            --cyan-400: #22d3ee;
+            --cyan-500: #06b6d4;
+            --cyan-glow: rgba(6, 182, 212, 0.2);
+
+            /* Semantic */
+            --success-400: #34d399;
+            --success-500: #10b981;
+            --success-glow: rgba(16, 185, 129, 0.2);
+            --danger-400: #fb7185;
+            --danger-500: #f43f5e;
+            --danger-glow: rgba(244, 63, 94, 0.2);
+            --warning-400: #fbbf24;
+            --amber-500: #f59e0b;
+
+            /* Text */
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --text-dim: #475569;
+
+            /* Radius */
+            --radius-sm: 0.5rem;
+            --radius-md: 0.75rem;
+            --radius-lg: 1rem;
+            --radius-xl: 1.25rem;
+            --radius-2xl: 1.5rem;
+            --radius-full: 9999px;
+
+            /* Transition */
+            --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', system-ui, sans-serif;
-        }
+        /* Reset */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; }
 
         body {
-            background: radial-gradient(circle at top right, #1e1b4b, #0f172a 60%);
-            color: var(--text-main);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg-body);
+            color: var(--text-secondary);
+            line-height: 1.65;
             min-height: 100vh;
-            padding: 2rem 1rem;
+            overflow-x: hidden;
         }
 
-        .container {
-            max-width: 1200px;
+        /* Ambient glow background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 10% 0%, rgba(99, 102, 241, 0.12) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 50% at 90% 90%, rgba(6, 182, 212, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse 40% 40% at 50% 50%, rgba(79, 70, 229, 0.04) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ================================================================
+           NAVIGATION
+           ================================================================ */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(6, 8, 15, 0.8);
+            backdrop-filter: blur(20px) saturate(1.5);
+            -webkit-backdrop-filter: blur(20px) saturate(1.5);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 0.85rem 2rem;
+            transition: background 0.3s;
+        }
+
+        .nav-inner {
+            max-width: 1280px;
             margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        header {
-            text-align: center;
-            margin-bottom: 2rem;
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 800;
+            font-size: 1.15rem;
+            letter-spacing: -0.03em;
         }
 
-        header h1 {
-            font-size: 2.25rem;
+        .logo-mark {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary-500), var(--cyan-500));
+            display: grid;
+            place-items: center;
+            box-shadow: 0 0 18px var(--primary-glow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo-mark::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.2));
+        }
+
+        .logo-mark svg {
+            width: 18px;
+            height: 18px;
+            fill: white;
+            position: relative;
+            z-index: 1;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.75rem;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: color 0.2s;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-400);
+            border-radius: 1px;
+            transition: width 0.3s var(--ease-out);
+        }
+
+        .nav-links a:hover { color: var(--text-primary); }
+        .nav-links a:hover::after { width: 100%; }
+
+        .btn-nav-cta {
+            background: linear-gradient(135deg, var(--primary-600), var(--primary-500));
+            color: white;
+            padding: 0.55rem 1.25rem;
+            border-radius: var(--radius-full);
+            font-size: 0.825rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px var(--primary-glow);
+        }
+
+        .btn-nav-cta:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px var(--primary-glow);
+        }
+
+        /* Mobile nav toggle */
+        .nav-toggle { display: none; background: none; border: none; cursor: pointer; padding: 0.5rem; }
+        .nav-toggle span { display: block; width: 22px; height: 2px; background: var(--text-secondary); margin: 5px 0; transition: 0.3s; border-radius: 2px; }
+
+        @media (max-width: 768px) {
+            .nav-toggle { display: block; }
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(6, 8, 15, 0.95);
+                backdrop-filter: blur(20px);
+                flex-direction: column;
+                padding: 1.5rem;
+                gap: 1rem;
+                border-bottom: 1px solid var(--border-subtle);
+            }
+            .nav-links.open { display: flex; }
+            .btn-nav-cta { display: none; }
+        }
+
+        /* ================================================================
+           LAYOUT UTILITIES
+           ================================================================ */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .section-label {
+            font-size: 0.725rem;
             font-weight: 700;
-            background: linear-gradient(to right, #60a5fa, #a78bfa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--primary-300);
             margin-bottom: 0.5rem;
         }
 
-        header p {
-            color: var(--text-muted);
-            font-size: 1rem;
+        .section-title {
+            font-size: 2.25rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.03em;
+            line-height: 1.2;
+            margin-bottom: 0.75rem;
         }
 
-        .academic-badge {
-            display: inline-block;
-            background: rgba(59, 130, 246, 0.15);
-            border: 1px solid rgba(59, 130, 246, 0.3);
-            color: #93c5fd;
-            padding: 0.5rem 1rem;
-            border-radius: 9999px;
-            font-size: 0.85rem;
-            margin-top: 0.75rem;
+        .section-desc {
+            color: var(--text-secondary);
+            max-width: 560px;
+            font-size: 1.025rem;
         }
 
-        .grid {
+        .section-header {
+            text-align: center;
+            margin: 0 auto 3rem;
+        }
+
+        .section-header .section-desc {
+            margin: 0 auto;
+        }
+
+        /* ================================================================
+           HERO
+           ================================================================ */
+        .hero {
+            padding: 5.5rem 0 5rem;
             display: grid;
             grid-template-columns: 1fr;
-            gap: 1.5rem;
-        }
-
-        @media (min-width: 900px) {
-            .grid {
-                grid-template-columns: 1.1fr 0.9fr;
-            }
-        }
-
-        .card {
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--card-border);
-            border-radius: 1rem;
-            padding: 1.5rem;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
-        }
-
-        .card-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 1.25rem;
-            display: flex;
+            gap: 3.5rem;
             align-items: center;
-            gap: 0.5rem;
         }
 
-        .form-section {
-            margin-bottom: 1.25rem;
+        @media (min-width: 1024px) {
+            .hero { grid-template-columns: 1.15fr 0.85fr; }
         }
 
-        .form-section-title {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #93c5fd;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.75rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding-bottom: 0.25rem;
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: rgba(99, 102, 241, 0.08);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            color: var(--primary-200);
+            padding: 0.4rem 1rem;
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            margin-bottom: 1.75rem;
         }
 
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 0.85rem;
+        .pulse-dot {
+            width: 7px; height: 7px;
+            background: var(--cyan-400);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--cyan-400);
+            animation: pulse-glow 2.5s infinite;
         }
 
-        .input-group {
+        @keyframes pulse-glow {
+            0%, 100% { transform: scale(0.9); opacity: 0.7; }
+            50% { transform: scale(1.4); opacity: 1; }
+        }
+
+        .hero-title {
+            font-size: clamp(2.25rem, 5vw, 3.5rem);
+            font-weight: 900;
+            color: var(--text-primary);
+            line-height: 1.1;
+            letter-spacing: -0.04em;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-title .gradient-text {
+            background: linear-gradient(135deg, #818cf8, #22d3ee, #818cf8);
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer-text 6s ease-in-out infinite;
+        }
+
+        @keyframes shimmer-text {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .hero-desc {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 2.25rem;
+            max-width: 520px;
+            line-height: 1.75;
+        }
+
+        .hero-actions {
             display: flex;
-            flex-direction: column;
-            gap: 0.35rem;
+            gap: 1rem;
+            flex-wrap: wrap;
         }
 
-        .input-group label {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        .input-group input, .input-group select {
-            background: var(--input-bg);
-            border: 1px solid var(--input-border);
-            color: var(--text-main);
-            padding: 0.5rem 0.75rem;
-            border-radius: 0.5rem;
-            font-size: 0.9rem;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-
-        .input-group input:focus, .input-group select:focus {
-            border-color: var(--primary);
-        }
-
-        .btn-predict {
-            width: 100%;
-            background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+        .btn-hero-primary {
+            background: linear-gradient(135deg, var(--primary-600), var(--primary-500));
             color: white;
+            padding: 0.95rem 2rem;
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            font-weight: 700;
+            text-decoration: none;
             border: none;
-            padding: 0.85rem;
-            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: transform 0.25s var(--ease-out), box-shadow 0.25s;
+            box-shadow: 0 8px 30px -5px var(--primary-glow);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .btn-hero-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 40px -5px var(--primary-glow);
+        }
+
+        .btn-hero-secondary {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border-card);
+            color: var(--text-primary);
+            padding: 0.95rem 1.75rem;
+            border-radius: var(--radius-md);
             font-size: 1rem;
             font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.15s, box-shadow 0.15s;
-            margin-top: 1rem;
+            text-decoration: none;
+            transition: background 0.2s, border-color 0.25s;
         }
 
-        .btn-predict:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.4);
+        .btn-hero-secondary:hover {
+            background: rgba(51, 65, 85, 0.7);
+            border-color: rgba(255, 255, 255, 0.15);
         }
 
-        .results-empty {
-            text-align: center;
-            padding: 3rem 1rem;
-            color: var(--text-muted);
+        /* Hero visual card */
+        .hero-visual-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius-2xl);
+            padding: 2rem;
+            backdrop-filter: blur(24px);
+            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.6);
+            position: relative;
+            overflow: hidden;
         }
 
-        .status-badge {
-            text-align: center;
-            padding: 1rem;
-            border-radius: 0.75rem;
-            font-size: 1.5rem;
-            font-weight: 700;
+        .hero-visual-card::before {
+            content: '';
+            position: absolute;
+            top: -80%;
+            left: -30%;
+            width: 160%;
+            height: 160%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 55%);
+            pointer-events: none;
+        }
+
+        .hv-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 1.25rem;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-subtle);
         }
 
-        .status-profitable {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.3));
-            border: 1px solid rgba(16, 185, 129, 0.4);
-            color: #34d399;
-        }
-
-        .status-not-profitable {
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.3));
-            border: 1px solid rgba(239, 68, 68, 0.4);
-            color: #f87171;
-        }
-
-        .metric-card {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid var(--input-border);
-            border-radius: 0.75rem;
-            padding: 1rem;
-            text-align: center;
-            margin-bottom: 1rem;
-        }
-
-        .metric-value {
-            font-size: 2.25rem;
+        .hv-tag {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.8rem;
             font-weight: 700;
-            color: #60a5fa;
+            color: var(--cyan-400);
         }
 
-        .metric-label {
-            font-size: 0.85rem;
+        .hv-model-tag {
+            font-size: 0.725rem;
             color: var(--text-muted);
+            background: rgba(100, 116, 139, 0.12);
+            padding: 0.25rem 0.7rem;
+            border-radius: var(--radius-full);
         }
 
-        .fin-grid {
+        .hv-score {
+            font-size: 3.25rem;
+            font-weight: 900;
+            color: var(--success-400);
+            letter-spacing: -0.03em;
+            text-shadow: 0 0 30px var(--success-glow);
+            line-height: 1;
+            margin-bottom: 0.35rem;
+        }
+
+        .hv-label {
+            font-size: 0.85rem;
+            color: var(--success-500);
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            margin-bottom: 1.5rem;
+        }
+
+        .hv-stats {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 0.75rem;
-            margin-bottom: 1.25rem;
         }
 
-        .fin-box {
-            background: rgba(15, 23, 42, 0.5);
-            border: 1px solid var(--input-border);
-            border-radius: 0.5rem;
-            padding: 0.75rem;
+        .hv-stat {
+            background: rgba(10, 15, 30, 0.6);
+            border: 1px solid var(--border-subtle);
+            padding: 0.85rem;
+            border-radius: var(--radius-md);
         }
 
-        .fin-box-label {
-            font-size: 0.75rem;
+        .hv-stat-label {
+            font-size: 0.65rem;
             color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.2rem;
         }
 
-        .fin-box-val {
+        .hv-stat-value {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* ================================================================
+           HOW IT WORKS — Steps
+           ================================================================ */
+        .steps-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 5rem;
+        }
+
+        .step-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            padding: 2rem 1.75rem;
+            border-radius: var(--radius-xl);
+            transition: transform 0.3s var(--ease-out), border-color 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .step-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-500), var(--cyan-500));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .step-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(99, 102, 241, 0.3);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.4);
+        }
+
+        .step-card:hover::before { opacity: 1; }
+
+        .step-number {
+            font-size: 2.75rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(6, 182, 212, 0.15));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            line-height: 1;
+        }
+
+        .step-name {
             font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-main);
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.6rem;
+            letter-spacing: -0.01em;
         }
 
-        .summary-box {
-            background: rgba(15, 23, 42, 0.8);
-            border-left: 4px solid var(--primary);
-            padding: 1rem;
-            border-radius: 0 0.5rem 0.5rem 0;
-            font-family: monospace;
-            font-size: 0.8rem;
-            white-space: pre-wrap;
-            color: #cbd5e1;
-        }
-
-        .disclaimer {
-            font-size: 0.75rem;
+        .step-card p {
+            font-size: 0.9rem;
             color: var(--text-muted);
-            margin-top: 1rem;
-            text-align: center;
-            font-style: italic;
+            line-height: 1.6;
         }
 
-        footer {
-            text-align: center;
-            margin-top: 3rem;
-            color: var(--text-muted);
+        /* ================================================================
+           ANALYSIS FORM
+           ================================================================ */
+        .analysis-area { padding: 2rem 0 5rem; }
+
+        .input-cards-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .input-cards-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .input-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius-xl);
+            padding: 1.5rem;
+            backdrop-filter: blur(16px);
+            transition: border-color 0.3s;
+        }
+
+        .input-card:hover { border-color: rgba(99, 102, 241, 0.2); }
+
+        .input-card-header {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding-bottom: 0.65rem;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .card-icon-box {
+            width: 28px; height: 28px;
+            border-radius: 7px;
+            display: grid;
+            place-items: center;
             font-size: 0.85rem;
         }
 
-        footer a {
-            color: #60a5fa;
+        .card-icon-box.demographics { background: rgba(99, 102, 241, 0.15); }
+        .card-icon-box.retail { background: rgba(6, 182, 212, 0.15); }
+        .card-icon-box.competition { background: rgba(245, 158, 11, 0.15); }
+        .card-icon-box.costs { background: rgba(16, 185, 129, 0.15); }
+
+        .fields-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 0.9rem;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .field label {
+            font-size: 0.775rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .field input, .field select {
+            background: var(--bg-input);
+            border: 1px solid var(--border-input);
+            color: var(--text-primary);
+            padding: 0.6rem 0.75rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            width: 100%;
+        }
+
+        .field input:focus, .field select:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.12);
+        }
+
+        .field-hint {
+            font-size: 0.675rem;
+            color: var(--text-dim);
+        }
+
+        .field-full { grid-column: 1 / -1; }
+
+        /* Model selector */
+        .model-picker {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius-xl);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .model-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 0.85rem;
+            margin-top: 0.85rem;
+        }
+
+        .model-option {
+            background: rgba(10, 15, 30, 0.55);
+            border: 1.5px solid var(--border-input);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.25s;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.7rem;
+        }
+
+        .model-option:hover { border-color: rgba(129, 140, 248, 0.35); }
+
+        .model-option.active {
+            border-color: var(--primary-400);
+            background: rgba(79, 70, 229, 0.1);
+            box-shadow: 0 0 20px rgba(79, 70, 229, 0.15);
+        }
+
+        .radio-dot {
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            border: 2px solid var(--text-dim);
+            margin-top: 2px;
+            flex-shrink: 0;
+            display: grid;
+            place-items: center;
+            transition: border-color 0.2s;
+        }
+
+        .model-option.active .radio-dot {
+            border-color: var(--primary-400);
+        }
+
+        .model-option.active .radio-dot::after {
+            content: '';
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: var(--primary-400);
+        }
+
+        .model-opt-title { font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.15rem; }
+        .model-opt-desc { font-size: 0.725rem; color: var(--text-muted); }
+        .model-note { font-size: 0.725rem; color: var(--text-dim); margin-top: 0.65rem; }
+
+        /* Error banner */
+        .error-banner {
+            display: none;
+            background: rgba(244, 63, 94, 0.1);
+            border: 1px solid rgba(244, 63, 94, 0.35);
+            color: var(--danger-400);
+            padding: 0.85rem 1.1rem;
+            border-radius: var(--radius-md);
+            margin-bottom: 1.25rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        /* Submit CTA */
+        .btn-analyze {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+            color: white;
+            border: none;
+            padding: 1.1rem;
+            border-radius: var(--radius-md);
+            font-size: 1.05rem;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            transition: transform 0.25s var(--ease-out), box-shadow 0.25s;
+            box-shadow: 0 8px 30px var(--primary-glow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.65rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-analyze::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, transparent 30%, rgba(255,255,255,0.08) 50%, transparent 70%);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .btn-analyze:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 40px var(--primary-glow);
+        }
+
+        .btn-analyze:hover::before {
+            transform: translateX(100%);
+        }
+
+        .btn-analyze:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .spinner {
+            display: none;
+            width: 18px; height: 18px;
+            border: 3px solid rgba(255,255,255,0.25);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ================================================================
+           RESULTS
+           ================================================================ */
+        .results-area {
+            display: none;
+            padding-top: 2rem;
+            animation: results-in 0.6s var(--ease-out) forwards;
+        }
+
+        @keyframes results-in {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-main-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius-2xl);
+            padding: 2.5rem;
+            backdrop-filter: blur(24px);
+            margin-bottom: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .result-top {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        @media (min-width: 768px) {
+            .result-top { grid-template-columns: 0.85fr 1.15fr; }
+        }
+
+        /* Gauge */
+        .gauge-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .outcome-pill {
+            display: inline-block;
+            padding: 0.6rem 1.75rem;
+            border-radius: var(--radius-full);
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            margin-bottom: 1rem;
+        }
+
+        .pill-profitable {
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            color: var(--success-400);
+            box-shadow: 0 0 30px var(--success-glow);
+        }
+
+        .pill-not-profitable {
+            background: rgba(244, 63, 94, 0.12);
+            border: 1px solid rgba(244, 63, 94, 0.35);
+            color: var(--danger-400);
+            box-shadow: 0 0 30px var(--danger-glow);
+        }
+
+        .gauge-svg { width: 190px; height: 190px; }
+
+        .gauge-bg-ring {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.07);
+            stroke-width: 12;
+        }
+
+        .gauge-progress-ring {
+            fill: none;
+            stroke: var(--success-400);
+            stroke-width: 12;
+            stroke-linecap: round;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+            stroke-dasharray: 502;
+            stroke-dashoffset: 502;
+            transition: stroke-dashoffset 1.5s var(--ease-out), stroke 0.5s;
+        }
+
+        .gauge-pct {
+            font-size: 2.25rem;
+            font-weight: 900;
+            fill: var(--text-primary);
+            text-anchor: middle;
+            dominant-baseline: central;
+        }
+
+        .gauge-label-text {
+            font-size: 0.7rem;
+            fill: var(--text-muted);
+            text-anchor: middle;
+            letter-spacing: 0.08em;
+        }
+
+        .model-badge {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .model-badge strong { color: var(--text-primary); }
+
+        /* Financial cards */
+        .fin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 0.85rem;
+            margin-bottom: 1.75rem;
+        }
+
+        .fin-card {
+            background: rgba(10, 15, 30, 0.55);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 1.1rem;
+            transition: border-color 0.2s;
+        }
+
+        .fin-card:hover { border-color: rgba(99, 102, 241, 0.2); }
+
+        .fin-label { font-size: 0.725rem; color: var(--text-muted); margin-bottom: 0.25rem; }
+        .fin-value { font-size: 1.2rem; font-weight: 700; color: var(--text-primary); }
+
+        .fin-footnote {
+            font-size: 0.725rem;
+            color: var(--text-dim);
+            margin-bottom: 1.5rem;
+            font-style: italic;
+        }
+
+        /* Insights badges */
+        .insights-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 0.75rem;
+            margin: 1.5rem 0;
+        }
+
+        .insight-badge {
+            background: rgba(10, 15, 30, 0.5);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 0.85rem;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .insight-badge:hover { transform: translateY(-2px); }
+
+        .insight-name { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.2rem; }
+        .insight-val { font-size: 1rem; font-weight: 700; color: var(--text-primary); }
+
+        /* Summary */
+        .summary-block {
+            margin-top: 2rem;
+            border-top: 1px solid var(--border-subtle);
+            padding-top: 1.5rem;
+        }
+
+        .summary-title { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.75rem; }
+
+        .summary-content {
+            background: rgba(10, 15, 30, 0.5);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            font-size: 0.825rem;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            font-family: 'Inter', monospace;
+            line-height: 1.7;
+            max-height: 320px;
+            overflow-y: auto;
+        }
+
+        /* ================================================================
+           WHAT-IF SCENARIOS
+           ================================================================ */
+        .whatif-card {
+            max-width: 820px;
+            margin: 0 auto;
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            backdrop-filter: blur(16px);
+        }
+
+        .whatif-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .whatif-title { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); }
+
+        .whatif-live-prob {
+            font-size: 1.65rem;
+            font-weight: 900;
+            color: var(--primary-400);
+            transition: color 0.3s;
+        }
+
+        .slider-group { margin-bottom: 1.25rem; }
+
+        .slider-top {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.825rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+        }
+
+        .slider-top span:first-child { color: var(--text-secondary); }
+        .slider-top span:last-child { color: var(--text-primary); }
+
+        input[type="range"] {
+            width: 100%;
+            height: 5px;
+            border-radius: 3px;
+            background: var(--border-input);
+            outline: none;
+            accent-color: var(--primary-400);
+            cursor: pointer;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            background: var(--primary-400);
+            box-shadow: 0 0 10px var(--primary-glow);
+            cursor: pointer;
+        }
+
+        /* ================================================================
+           COMPARISON TABLE
+           ================================================================ */
+        .comp-wrap {
+            overflow-x: auto;
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius-xl);
+            backdrop-filter: blur(16px);
+        }
+
+        .comp-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        .comp-table th {
+            background: rgba(10, 15, 30, 0.7);
+            padding: 0.9rem 1.1rem;
+            color: var(--text-muted);
+            font-size: 0.725rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border-card);
+            text-align: left;
+        }
+
+        .comp-table td {
+            padding: 1rem 1.1rem;
+            border-bottom: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+        }
+
+        .comp-table tbody tr {
+            transition: background 0.15s;
+        }
+
+        .comp-table tbody tr:hover {
+            background: rgba(99, 102, 241, 0.04);
+        }
+
+        .comp-table tbody tr:last-child td { border-bottom: none; }
+
+        .text-success { color: var(--success-400); font-weight: 700; }
+        .text-danger { color: var(--danger-400); font-weight: 700; }
+
+        /* ================================================================
+           TECH STACK SECTION
+           ================================================================ */
+        .tech-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .tech-chip {
+            background: rgba(14, 22, 40, 0.6);
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius-full);
+            padding: 0.5rem 1.25rem;
+            font-size: 0.825rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: border-color 0.2s, color 0.2s;
+        }
+
+        .tech-chip:hover {
+            border-color: var(--primary-400);
+            color: var(--text-primary);
+        }
+
+        /* ================================================================
+           FOOTER
+           ================================================================ */
+        footer {
+            border-top: 1px solid var(--border-subtle);
+            padding: 3rem 0 2.5rem;
+            margin-top: 6rem;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-brand { font-size: 0.9rem; color: var(--text-secondary); font-weight: 500; }
+
+        .footer-stack {
+            margin-top: 0.5rem;
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .footer-link {
+            display: inline-block;
+            margin-top: 0.75rem;
+            color: var(--primary-300);
             text-decoration: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: color 0.2s;
+        }
+
+        .footer-link:hover { color: var(--primary-200); }
+
+        .footer-disclaimer {
+            max-width: 720px;
+            margin: 1.5rem auto 0;
+            font-size: 0.725rem;
+            color: var(--text-dim);
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        /* ================================================================
+           ANIMATIONS — Scroll Reveal
+           ================================================================ */
+        .reveal {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ================================================================
+           RESPONSIVE FINE-TUNING
+           ================================================================ */
+        @media (max-width: 480px) {
+            .hero-title { font-size: 1.85rem; }
+            .section-title { font-size: 1.6rem; }
+            .result-main-card { padding: 1.5rem; }
+            .fin-grid { grid-template-columns: 1fr 1fr; }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header>
-        <h1>Watch Store Location Success Prediction</h1>
-        <p>Machine Learning Decision-Support System for Retail Store Expansion</p>
-        <div class="academic-badge">
-            Academic Disclosure: Synthetic dataset created for ML practice. Does not guarantee real-world store profitability.
+    <!-- ============================================================
+         NAVIGATION
+         ============================================================ -->
+    <nav class="navbar" id="main-nav">
+        <div class="nav-inner">
+            <a href="#" class="logo">
+                <div class="logo-mark">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                </div>
+                <span>WatchStore AI</span>
+            </a>
+
+            <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">
+                <span></span><span></span><span></span>
+            </button>
+
+            <ul class="nav-links" id="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#how-it-works">How It Works</a></li>
+                <li><a href="#analyze">Analyze</a></li>
+                <li><a href="#scenarios">Scenarios</a></li>
+                <li><a href="#comparison">Compare</a></li>
+            </ul>
+
+            <a href="#analyze" class="btn-nav-cta">Analyze Location</a>
         </div>
-    </header>
+    </nav>
 
-    <div class="grid">
-        <!-- Left Column: Input Parameters -->
-        <div class="card">
-            <div class="card-title">📍 Location & Business Parameters</div>
-            
-            <form id="prediction-form">
-                <!-- Section 1: Demographics -->
-                <div class="form-section">
-                    <div class="form-section-title">Demographics & Population</div>
-                    <div class="form-grid">
-                        <div class="input-group">
-                            <label for="population">Population (5km)</label>
-                            <input type="number" id="population" value="180000" required>
+    <div class="container">
+
+        <!-- ============================================================
+             HERO
+             ============================================================ -->
+        <section class="hero" id="home">
+            <div class="hero-content">
+                <div class="hero-eyebrow">
+                    <div class="pulse-dot"></div>
+                    AI-POWERED LOCATION INTELLIGENCE
+                </div>
+                <h1 class="hero-title">
+                    Find the Right Location for <span class="gradient-text">Your Watch Store</span>
+                </h1>
+                <p class="hero-desc">
+                    Analyze demographics, foot traffic, competition, and operating costs to estimate profitability probability before you invest.
+                </p>
+                <div class="hero-actions">
+                    <a href="#analyze" class="btn-hero-primary">Analyze a Location</a>
+                    <a href="#how-it-works" class="btn-hero-secondary">How It Works</a>
+                </div>
+            </div>
+
+            <div class="hero-visual-card">
+                <div class="hv-header">
+                    <div class="hv-tag">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                        Downtown Commercial Site
+                    </div>
+                    <span class="hv-model-tag">Random Forest</span>
+                </div>
+                <div class="hv-score">93.0%</div>
+                <div class="hv-label">PROFITABLE LOCATION</div>
+                <div class="hv-stats">
+                    <div class="hv-stat">
+                        <div class="hv-stat-label">Foot Traffic</div>
+                        <div class="hv-stat-value">14,000/day</div>
+                    </div>
+                    <div class="hv-stat">
+                        <div class="hv-stat-label">Monthly Rent</div>
+                        <div class="hv-stat-value">$6,500</div>
+                    </div>
+                    <div class="hv-stat">
+                        <div class="hv-stat-label">Demand Score</div>
+                        <div class="hv-stat-value">8.2/10</div>
+                    </div>
+                    <div class="hv-stat">
+                        <div class="hv-stat-label">Break-Even</div>
+                        <div class="hv-stat-value">6.1 Mo.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================
+             HOW IT WORKS
+             ============================================================ -->
+        <section id="how-it-works" style="padding: 4rem 0;">
+            <div class="section-header reveal">
+                <div class="section-label">Workflow</div>
+                <h2 class="section-title">How It Works</h2>
+                <p class="section-desc">Three steps to scientifically evaluate retail watch store locations.</p>
+            </div>
+
+            <div class="steps-row">
+                <div class="step-card reveal">
+                    <div class="step-number">01</div>
+                    <div class="step-name">Enter Location Data</div>
+                    <p>Provide population, foot traffic, rent, competitors, and market demand metrics for your candidate site.</p>
+                </div>
+                <div class="step-card reveal">
+                    <div class="step-number">02</div>
+                    <div class="step-name">Run ML Analysis</div>
+                    <p>Our trained Scikit-learn model evaluates non-linear feature relationships using test-verified algorithms.</p>
+                </div>
+                <div class="step-card reveal">
+                    <div class="step-number">03</div>
+                    <div class="step-name">Understand Results</div>
+                    <p>Receive profitability probability, heuristic site insights, and financial break-even projections.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================
+             ANALYSIS INPUT FORM
+             ============================================================ -->
+        <section class="analysis-area" id="analyze">
+            <div class="section-header reveal">
+                <div class="section-label">Analysis Tool</div>
+                <h2 class="section-title">Analyze a Location</h2>
+                <p class="section-desc">Enter the characteristics of your proposed location and let the model estimate its profitability potential.</p>
+            </div>
+
+            <div class="error-banner" id="error-banner"></div>
+
+            <form id="location-form">
+                <div class="input-cards-grid">
+
+                    <!-- Card 1: Demographics -->
+                    <div class="input-card reveal">
+                        <div class="input-card-header">
+                            <div class="card-icon-box demographics">&#x1F465;</div>
+                            DEMOGRAPHICS
                         </div>
-                        <div class="input-group">
-                            <label for="average_monthly_income">Avg Income ($)</label>
-                            <input type="number" step="0.01" id="average_monthly_income" value="6500.00" required>
+                        <div class="fields-row">
+                            <div class="field">
+                                <label for="population">Population (5km)</label>
+                                <input type="number" id="population" value="180000" placeholder="e.g. 180000" required>
+                                <span class="field-hint">Local population within 5km</span>
+                            </div>
+                            <div class="field">
+                                <label for="average_monthly_income">Avg Monthly Income ($)</label>
+                                <input type="number" step="0.01" id="average_monthly_income" value="6500.00" placeholder="e.g. 6500" required>
+                                <span class="field-hint">Average household income</span>
+                            </div>
+                            <div class="field field-full">
+                                <label for="target_age_group_score">Target Age Group Score (1-10)</label>
+                                <input type="number" step="0.1" id="target_age_group_score" value="7.5" min="1" max="10" placeholder="7.5" required>
+                                <span class="field-hint">Demographic alignment for target buyer age</span>
+                            </div>
                         </div>
-                        <div class="input-group">
-                            <label for="target_age_group_score">Target Age Score (1-10)</label>
-                            <input type="number" step="0.1" id="target_age_group_score" value="7.5" min="1" max="10" required>
+                    </div>
+
+                    <!-- Card 2: Foot Traffic & Retail -->
+                    <div class="input-card reveal">
+                        <div class="input-card-header">
+                            <div class="card-icon-box retail">&#x1F3EC;</div>
+                            FOOT TRAFFIC &amp; RETAIL
+                        </div>
+                        <div class="fields-row">
+                            <div class="field">
+                                <label for="daily_foot_traffic">Daily Foot Traffic</label>
+                                <input type="number" id="daily_foot_traffic" value="14000" placeholder="e.g. 14000" required>
+                                <span class="field-hint">Pedestrian traffic per day</span>
+                            </div>
+                            <div class="field">
+                                <label for="distance_to_mall_km">Dist. to Mall (km)</label>
+                                <input type="number" step="0.1" id="distance_to_mall_km" value="1.2" placeholder="e.g. 1.2" required>
+                                <span class="field-hint">Distance to nearest mall</span>
+                            </div>
+                            <div class="field">
+                                <label for="nearby_retail_stores">Nearby Retail Stores</label>
+                                <input type="number" id="nearby_retail_stores" value="45" placeholder="e.g. 45" required>
+                                <span class="field-hint">Complementary stores nearby</span>
+                            </div>
+                            <div class="field">
+                                <label for="estimated_monthly_customers">Est. Monthly Customers</label>
+                                <input type="number" id="estimated_monthly_customers" value="1200" placeholder="e.g. 1200" required>
+                                <span class="field-hint">Projected store visitors</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: Competition & Demand -->
+                    <div class="input-card reveal">
+                        <div class="input-card-header">
+                            <div class="card-icon-box competition">&#x26A1;</div>
+                            COMPETITION &amp; DEMAND
+                        </div>
+                        <div class="fields-row">
+                            <div class="field">
+                                <label for="nearby_competitors">Nearby Competitors</label>
+                                <input type="number" id="nearby_competitors" value="3" placeholder="e.g. 3" required>
+                                <span class="field-hint">Watch stores within 3km</span>
+                            </div>
+                            <div class="field">
+                                <label for="local_demand_score">Local Demand Score (1-10)</label>
+                                <input type="number" step="0.1" id="local_demand_score" value="8.2" min="1" max="10" placeholder="8.2" required>
+                                <span class="field-hint">Demand index for fashion watches</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 4: Operating Costs -->
+                    <div class="input-card reveal">
+                        <div class="input-card-header">
+                            <div class="card-icon-box costs">&#x1F4B5;</div>
+                            OPERATING COSTS &amp; PRICING
+                        </div>
+                        <div class="fields-row">
+                            <div class="field">
+                                <label for="monthly_rent">Monthly Rent ($)</label>
+                                <input type="number" step="0.01" id="monthly_rent" value="6500.00" placeholder="e.g. 6500" required>
+                                <span class="field-hint">Monthly store lease</span>
+                            </div>
+                            <div class="field">
+                                <label for="monthly_operating_cost">Operating Cost ($)</label>
+                                <input type="number" step="0.01" id="monthly_operating_cost" value="7500.00" placeholder="e.g. 7500" required>
+                                <span class="field-hint">Non-rent monthly overhead</span>
+                            </div>
+                            <div class="field field-full">
+                                <label for="average_purchase_value">Avg Purchase Value ($)</label>
+                                <input type="number" step="0.01" id="average_purchase_value" value="320.00" placeholder="e.g. 320" required>
+                                <span class="field-hint">Expected average transaction</span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Section 2: Traffic & Retail Environment -->
-                <div class="form-section">
-                    <div class="form-section-title">Traffic & Retail Environment</div>
-                    <div class="form-grid">
-                        <div class="input-group">
-                            <label for="daily_foot_traffic">Daily Foot Traffic</label>
-                            <input type="number" id="daily_foot_traffic" value="14000" required>
+                <!-- Model Selector -->
+                <div class="model-picker reveal">
+                    <div style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary);">Prediction Model</div>
+                    <div class="model-options">
+                        <div class="model-option active" id="opt-rf" onclick="selectModel('rf')">
+                            <div class="radio-dot"></div>
+                            <div>
+                                <div class="model-opt-title">Random Forest Classifier (Recommended)</div>
+                                <div class="model-opt-desc">Higher test ROC-AUC (0.9850). Non-linear decision boundary.</div>
+                            </div>
                         </div>
-                        <div class="input-group">
-                            <label for="distance_to_mall_km">Dist. to Mall (km)</label>
-                            <input type="number" step="0.1" id="distance_to_mall_km" value="1.2" required>
-                        </div>
-                        <div class="input-group">
-                            <label for="nearby_retail_stores">Nearby Retail Stores</label>
-                            <input type="number" id="nearby_retail_stores" value="45" required>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Section 3: Competition & Demand -->
-                <div class="form-section">
-                    <div class="form-section-title">Competition & Demand</div>
-                    <div class="form-grid">
-                        <div class="input-group">
-                            <label for="nearby_competitors">Competitors (3km)</label>
-                            <input type="number" id="nearby_competitors" value="3" required>
-                        </div>
-                        <div class="input-group">
-                            <label for="local_demand_score">Demand Score (1-10)</label>
-                            <input type="number" step="0.1" id="local_demand_score" value="8.2" min="1" max="10" required>
-                        </div>
-                        <div class="input-group">
-                            <label for="model_type">ML Model</label>
-                            <select id="model_type">
-                                <option value="rf" selected>Random Forest (ROC-AUC: 0.9850)</option>
-                                <option value="lr">Logistic Regression (ROC-AUC: 0.9729)</option>
-                            </select>
+                        <div class="model-option" id="opt-lr" onclick="selectModel('lr')">
+                            <div class="radio-dot"></div>
+                            <div>
+                                <div class="model-opt-title">Logistic Regression</div>
+                                <div class="model-opt-desc">Parametric linear baseline (Test ROC-AUC: 0.9729).</div>
+                            </div>
                         </div>
                     </div>
+                    <div class="model-note">Random Forest is selected based on the model evaluation performed on the held-out test set.</div>
                 </div>
 
-                <!-- Section 4: Operations & Costs -->
-                <div class="form-section">
-                    <div class="form-section-title">Operations & Overhead Costs</div>
-                    <div class="form-grid">
-                        <div class="input-group">
-                            <label for="monthly_rent">Monthly Rent ($)</label>
-                            <input type="number" step="0.01" id="monthly_rent" value="6500.00" required>
-                        </div>
-                        <div class="input-group">
-                            <label for="monthly_operating_cost">Operating Cost ($)</label>
-                            <input type="number" step="0.01" id="monthly_operating_cost" value="7500.00" required>
-                        </div>
-                        <div class="input-group">
-                            <label for="estimated_monthly_customers">Est. Monthly Customers</label>
-                            <input type="number" id="estimated_monthly_customers" value="1200" required>
-                        </div>
-                        <div class="input-group">
-                            <label for="average_purchase_value">Avg Order Value ($)</label>
-                            <input type="number" step="0.01" id="average_purchase_value" value="320.00" required>
-                        </div>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn-predict" id="btn-submit">⚡ Predict Store Success</button>
+                <!-- Submit -->
+                <button type="submit" class="btn-analyze" id="btn-submit">
+                    <div class="spinner" id="btn-spinner"></div>
+                    <span>Analyze Location</span>
+                </button>
             </form>
-        </div>
+        </section>
 
-        <!-- Right Column: Results Output -->
-        <div class="card" id="results-panel">
-            <div class="card-title">📊 Decision Support Results</div>
-            
-            <div id="results-empty" class="results-empty">
-                <div style="font-size: 3rem; margin-bottom: 0.5rem;">🏬</div>
-                <p>Enter location metrics on the left and click <strong>Predict Store Success</strong> to run model inference.</p>
+        <!-- ============================================================
+             RESULTS OUTPUT
+             ============================================================ -->
+        <section class="results-area" id="results">
+            <div class="section-header">
+                <div class="section-label">Output</div>
+                <h2 class="section-title">Location Analysis</h2>
+                <p class="section-desc">Model-estimated profitability evaluation and decision support.</p>
             </div>
 
-            <div id="results-content" style="display: none;">
-                <!-- Status Badge -->
-                <div id="status-badge" class="status-badge">
-                    PROFITABLE
+            <div class="result-main-card">
+                <div class="result-top">
+                    <!-- Left: Gauge + Outcome -->
+                    <div class="gauge-wrap">
+                        <div id="outcome-pill" class="outcome-pill pill-profitable">PROFITABLE</div>
+
+                        <svg class="gauge-svg" viewBox="0 0 180 180">
+                            <circle class="gauge-bg-ring" cx="90" cy="90" r="80"></circle>
+                            <circle class="gauge-progress-ring" id="gauge-ring" cx="90" cy="90" r="80"></circle>
+                            <text class="gauge-pct" id="gauge-pct" x="90" y="82">93.0%</text>
+                            <text class="gauge-label-text" x="90" y="110">PROBABILITY</text>
+                        </svg>
+
+                        <div class="model-badge">
+                            Model: <strong id="res-model">Random Forest Classifier</strong>
+                        </div>
+                    </div>
+
+                    <!-- Right: Financials + Insights -->
+                    <div>
+                        <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem;">
+                            Financial Outlook
+                        </h3>
+
+                        <div class="fin-grid">
+                            <div class="fin-card">
+                                <div class="fin-label">Est. Monthly Revenue</div>
+                                <div class="fin-value" id="res-revenue">$38,400.00</div>
+                            </div>
+                            <div class="fin-card">
+                                <div class="fin-label">Total Monthly Cost</div>
+                                <div class="fin-value" id="res-cost">$14,000.00</div>
+                            </div>
+                            <div class="fin-card">
+                                <div class="fin-label">Est. Net Profit</div>
+                                <div class="fin-value" id="res-profit">$24,400.00</div>
+                            </div>
+                            <div class="fin-card">
+                                <div class="fin-label">Break-Even Timeline</div>
+                                <div class="fin-value" id="res-breakeven">6.1 Months</div>
+                            </div>
+                        </div>
+
+                        <div class="fin-footnote">
+                            *Financial estimates assume a 10% effective retail margin factor consistent with project baseline assumptions.
+                        </div>
+
+                        <h3 style="font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.6rem;">
+                            Business Insights
+                        </h3>
+
+                        <div class="insights-row">
+                            <div class="insight-badge">
+                                <div class="insight-name">Foot Traffic</div>
+                                <div class="insight-val" id="tag-traffic">High</div>
+                            </div>
+                            <div class="insight-badge">
+                                <div class="insight-name">Competition</div>
+                                <div class="insight-val" id="tag-comp">Low</div>
+                            </div>
+                            <div class="insight-badge">
+                                <div class="insight-name">Demand</div>
+                                <div class="insight-val" id="tag-demand">Strong</div>
+                            </div>
+                            <div class="insight-badge">
+                                <div class="insight-name">Rent</div>
+                                <div class="insight-val" id="tag-rent">Moderate</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Probability Score -->
-                <div class="metric-card">
-                    <div class="metric-value" id="probability-value">93.00%</div>
-                    <div class="metric-label">Model-Estimated Probability of Profitability (<span id="model-name">Random Forest</span>)</div>
-                </div>
-
-                <!-- Financial Heuristics Grid -->
-                <div class="fin-grid">
-                    <div class="fin-box">
-                        <div class="fin-box-label">Est. Monthly Revenue</div>
-                        <div class="fin-box-val" id="fin-revenue">$38,400.00</div>
-                    </div>
-                    <div class="fin-box">
-                        <div class="fin-box-label">Total Monthly Cost</div>
-                        <div class="fin-box-val" id="fin-cost">$14,000.00</div>
-                    </div>
-                    <div class="fin-box">
-                        <div class="fin-box-label">Est. Monthly Net Profit</div>
-                        <div class="fin-box-val" id="fin-profit">$24,400.00</div>
-                    </div>
-                    <div class="fin-box">
-                        <div class="fin-box-label">Est. Break-Even Period</div>
-                        <div class="fin-box-val" id="fin-breakeven">6.1 Months</div>
-                    </div>
-                </div>
-
-                <!-- Executive Summary -->
-                <div class="summary-box" id="summary-text">
-                    Loading location assessment summary...
-                </div>
-
-                <div class="disclaimer">
-                    Note: Both the ML model probability and financial calculator are academic decision-support estimates and do not guarantee real-world store profitability.
+                <!-- Summary -->
+                <div class="summary-block">
+                    <div class="summary-title">Executive Summary Assessment</div>
+                    <div class="summary-content" id="res-summary"></div>
                 </div>
             </div>
-        </div>
-    </div>
+        </section>
 
+        <!-- ============================================================
+             WHAT-IF SCENARIOS
+             ============================================================ -->
+        <section id="scenarios" style="padding: 4rem 0;">
+            <div class="section-header reveal">
+                <div class="section-label">Interactive Tool</div>
+                <h2 class="section-title">Explore What-If Scenarios</h2>
+                <p class="section-desc">Adjust parameters dynamically and observe real-time probability shifts.</p>
+            </div>
+
+            <div class="whatif-card reveal">
+                <div class="whatif-header">
+                    <div class="whatif-title">Sensitivity Slider Simulator</div>
+                    <div class="whatif-live-prob" id="slider-prob">93.0%</div>
+                </div>
+
+                <div class="slider-group">
+                    <div class="slider-top">
+                        <span>Monthly Rent ($)</span>
+                        <span id="lbl-rent">$6,500</span>
+                    </div>
+                    <input type="range" min="2000" max="18000" step="500" value="6500" id="slider-rent" oninput="onSliderChange()">
+                </div>
+
+                <div class="slider-group">
+                    <div class="slider-top">
+                        <span>Daily Foot Traffic</span>
+                        <span id="lbl-traffic">14,000</span>
+                    </div>
+                    <input type="range" min="1000" max="24000" step="500" value="14000" id="slider-traffic" oninput="onSliderChange()">
+                </div>
+
+                <div class="slider-group">
+                    <div class="slider-top">
+                        <span>Nearby Competitors</span>
+                        <span id="lbl-comp">3</span>
+                    </div>
+                    <input type="range" min="0" max="15" step="1" value="3" id="slider-comp" oninput="onSliderChange()">
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================
+             COMPARISON TABLE
+             ============================================================ -->
+        <section id="comparison" style="padding: 3rem 0 5rem;">
+            <div class="section-header reveal">
+                <div class="section-label">Comparison</div>
+                <h2 class="section-title">Compare Candidate Locations</h2>
+                <p class="section-desc">Multi-site ranking evaluated dynamically by the active machine learning model.</p>
+            </div>
+
+            <div class="comp-wrap reveal">
+                <table class="comp-table">
+                    <thead>
+                        <tr>
+                            <th>Location Name</th>
+                            <th>Foot Traffic</th>
+                            <th>Competitors</th>
+                            <th>Monthly Rent</th>
+                            <th>Probability</th>
+                            <th>Prediction</th>
+                        </tr>
+                    </thead>
+                    <tbody id="comp-tbody">
+                        <tr>
+                            <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">
+                                Evaluating candidate sites with machine learning model...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.75rem; text-align: right;">
+                *Candidate locations evaluated live via <code>/api/predict</code> using the active machine learning model.
+            </div>
+        </section>
+
+        <!-- ============================================================
+             TECH STACK
+             ============================================================ -->
+        <section style="padding: 3rem 0;" class="reveal">
+            <div class="section-header">
+                <div class="section-label">Technology</div>
+                <h2 class="section-title">Built With</h2>
+            </div>
+            <div class="tech-row">
+                <div class="tech-chip">Python 3</div>
+                <div class="tech-chip">Pandas</div>
+                <div class="tech-chip">NumPy</div>
+                <div class="tech-chip">Scikit-learn</div>
+                <div class="tech-chip">Random Forest</div>
+                <div class="tech-chip">Logistic Regression</div>
+                <div class="tech-chip">Vercel Serverless</div>
+            </div>
+        </section>
+
+    </div><!-- /.container -->
+
+    <!-- ============================================================
+         FOOTER
+         ============================================================ -->
     <footer>
-        Watch Store Location Success Prediction &bull; Academic Machine Learning Project &bull; Built with Python, Pandas, & Scikit-learn
+        <div class="container">
+            <div class="footer-brand">Watch Store Location Success Prediction</div>
+            <div class="footer-stack">Python &bull; Pandas &bull; NumPy &bull; Scikit-learn</div>
+            <a href="https://github.com/ansh1kaa/Watch-Store-Location-Success-Prediction" target="_blank" rel="noopener" class="footer-link">
+                GitHub Repository &rarr;
+            </a>
+            <div class="footer-disclaimer">
+                This project uses a synthetic dataset created for academic machine-learning practice.
+                It does not represent actual watch-store businesses or real-world locations.
+                Predictions are decision-support estimates and do not guarantee real-world profitability.
+            </div>
+        </div>
     </footer>
-</div>
 
-<script>
-document.getElementById('prediction-form').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    const btn = document.getElementById('btn-submit');
-    btn.innerText = '⏳ Processing Model Inference...';
-    btn.disabled = true;
+    <!-- ============================================================
+         JAVASCRIPT — Application Logic
+         ============================================================ -->
+    <script>
+        /* ----------------------------------------------------------
+           Candidate Locations Definition for Live Comparison
+           ---------------------------------------------------------- */
+        const CANDIDATE_SITES = {
+            'High-Street Pedestrian Zone': {
+                population: 250000,
+                average_monthly_income: 8500.0,
+                daily_foot_traffic: 22000,
+                nearby_competitors: 2,
+                monthly_rent: 8500.0,
+                distance_to_mall_km: 0.5,
+                nearby_retail_stores: 90,
+                estimated_monthly_customers: 1800,
+                average_purchase_value: 450.0,
+                monthly_operating_cost: 8000.0,
+                local_demand_score: 9.1,
+                target_age_group_score: 8.8
+            },
+            'Downtown Commercial Center': {
+                population: 180000,
+                average_monthly_income: 6500.0,
+                daily_foot_traffic: 14000,
+                nearby_competitors: 3,
+                monthly_rent: 6500.0,
+                distance_to_mall_km: 1.2,
+                nearby_retail_stores: 45,
+                estimated_monthly_customers: 1200,
+                average_purchase_value: 320.0,
+                monthly_operating_cost: 7500.0,
+                local_demand_score: 8.2,
+                target_age_group_score: 7.5
+            },
+            'Suburban Strip Mall': {
+                population: 45000,
+                average_monthly_income: 3800.0,
+                daily_foot_traffic: 4500,
+                nearby_competitors: 6,
+                monthly_rent: 11000.0,
+                distance_to_mall_km: 8.5,
+                nearby_retail_stores: 12,
+                estimated_monthly_customers: 400,
+                average_purchase_value: 180.0,
+                monthly_operating_cost: 9000.0,
+                local_demand_score: 4.5,
+                target_age_group_score: 5.0
+            }
+        };
 
-    const locationData = {
-        population: parseInt(document.getElementById('population').value),
-        average_monthly_income: parseFloat(document.getElementById('average_monthly_income').value),
-        daily_foot_traffic: parseInt(document.getElementById('daily_foot_traffic').value),
-        nearby_competitors: parseInt(document.getElementById('nearby_competitors').value),
-        monthly_rent: parseFloat(document.getElementById('monthly_rent').value),
-        distance_to_mall_km: parseFloat(document.getElementById('distance_to_mall_km').value),
-        nearby_retail_stores: parseInt(document.getElementById('nearby_retail_stores').value),
-        estimated_monthly_customers: parseInt(document.getElementById('estimated_monthly_customers').value),
-        average_purchase_value: parseFloat(document.getElementById('average_purchase_value').value),
-        monthly_operating_cost: parseFloat(document.getElementById('monthly_operating_cost').value),
-        local_demand_score: parseFloat(document.getElementById('local_demand_score').value),
-        target_age_group_score: parseFloat(document.getElementById('target_age_group_score').value)
-    };
+        /* ----------------------------------------------------------
+           Model Selection
+           ---------------------------------------------------------- */
+        let selectedModel = 'rf';
 
-    const modelType = document.getElementById('model_type').value;
+        function selectModel(key) {
+            selectedModel = key;
+            document.getElementById('opt-rf').classList.toggle('active', key === 'rf');
+            document.getElementById('opt-lr').classList.toggle('active', key === 'lr');
+            onSliderChange();
+            loadComparison();
+        }
 
-    try {
-        const response = await fetch('/api/predict', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                action: 'predict',
-                model_type: modelType,
-                location_data: locationData
-            })
+        /* ----------------------------------------------------------
+           Mobile Nav Toggle
+           ---------------------------------------------------------- */
+        document.getElementById('nav-toggle').addEventListener('click', function () {
+            document.getElementById('nav-links').classList.toggle('open');
         });
 
-        const contentType = response.headers.get('content-type') || '';
-        let data;
-        
-        if (contentType.includes('application/json')) {
-            data = await response.json();
-        } else {
-            const rawText = await response.text();
-            throw new Error(`Server returned non-JSON response (${response.status}): ${rawText.substring(0, 150)}`);
+        /* ----------------------------------------------------------
+           Error Display
+           ---------------------------------------------------------- */
+        function showError(msg) {
+            const el = document.getElementById('error-banner');
+            el.textContent = msg;
+            el.style.display = 'block';
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
-        if (response.ok) {
-            document.getElementById('results-empty').style.display = 'none';
-            document.getElementById('results-content').style.display = 'block';
+        function clearError() {
+            const el = document.getElementById('error-banner');
+            el.textContent = '';
+            el.style.display = 'none';
+        }
 
-            const badge = document.getElementById('status-badge');
+        /* ----------------------------------------------------------
+           Form Submission — Predict
+           ---------------------------------------------------------- */
+        document.getElementById('location-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            clearError();
+
+            const btn = document.getElementById('btn-submit');
+            const spinner = document.getElementById('btn-spinner');
+
+            btn.disabled = true;
+            spinner.style.display = 'inline-block';
+
+            const locationData = {
+                population: parseInt(document.getElementById('population').value, 10),
+                average_monthly_income: parseFloat(document.getElementById('average_monthly_income').value),
+                daily_foot_traffic: parseInt(document.getElementById('daily_foot_traffic').value, 10),
+                nearby_competitors: parseInt(document.getElementById('nearby_competitors').value, 10),
+                monthly_rent: parseFloat(document.getElementById('monthly_rent').value),
+                distance_to_mall_km: parseFloat(document.getElementById('distance_to_mall_km').value),
+                nearby_retail_stores: parseInt(document.getElementById('nearby_retail_stores').value, 10),
+                estimated_monthly_customers: parseInt(document.getElementById('estimated_monthly_customers').value, 10),
+                average_purchase_value: parseFloat(document.getElementById('average_purchase_value').value),
+                monthly_operating_cost: parseFloat(document.getElementById('monthly_operating_cost').value),
+                local_demand_score: parseFloat(document.getElementById('local_demand_score').value),
+                target_age_group_score: parseFloat(document.getElementById('target_age_group_score').value)
+            };
+
+            try {
+                const response = await fetch('/api/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'predict',
+                        model_type: selectedModel,
+                        location_data: locationData
+                    })
+                });
+
+                const contentType = response.headers.get('content-type') || '';
+                let data;
+
+                if (contentType.includes('application/json')) {
+                    data = await response.json();
+                } else {
+                    const text = await response.text();
+                    throw new Error('Server returned unexpected response: ' + text.substring(0, 120));
+                }
+
+                if (response.ok && data.success !== false) {
+                    renderResults(data, locationData);
+                    document.getElementById('results').style.display = 'block';
+                    document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    showError('Prediction Error: ' + (data.error || 'Server rejected prediction request.'));
+                }
+            } catch (err) {
+                showError('Request Failed: ' + (err.message || 'Unable to communicate with prediction service.'));
+            } finally {
+                btn.disabled = false;
+                spinner.style.display = 'none';
+            }
+        });
+
+        /* ----------------------------------------------------------
+           Render Results
+           ---------------------------------------------------------- */
+        function renderResults(data, inputs) {
+            const pill = document.getElementById('outcome-pill');
+            const ring = document.getElementById('gauge-ring');
+            const pctText = document.getElementById('gauge-pct');
+            const prob = Number.isFinite(Number(data.probability_percent)) ? Number(data.probability_percent) : 0;
+
+            // Outcome pill
             if (data.prediction === 'PROFITABLE') {
-                badge.className = 'status-badge status-profitable';
-                badge.innerText = 'PROFITABLE';
+                pill.className = 'outcome-pill pill-profitable';
+                pill.textContent = 'PROFITABLE';
+                ring.style.stroke = 'var(--success-400)';
             } else {
-                badge.className = 'status-badge status-not-profitable';
-                badge.innerText = 'NOT PROFITABLE';
+                pill.className = 'outcome-pill pill-not-profitable';
+                pill.textContent = 'NOT PROFITABLE';
+                ring.style.stroke = 'var(--danger-400)';
             }
 
-            document.getElementById('probability-value').innerText = (data.probability_percent || 0).toFixed(2) + '%';
-            document.getElementById('model-name').innerText = data.model_used || 'ML Classifier';
+            // Gauge animation
+            pctText.textContent = prob.toFixed(1) + '%';
+            const offset = 502 - (502 * Math.min(Math.max(prob, 0), 100) / 100);
+            ring.style.strokeDashoffset = offset;
 
+            // Model
+            document.getElementById('res-model').textContent = data.model_used || 'Random Forest Classifier';
+
+            // Financials
             const fin = data.financial_estimates || {};
-            document.getElementById('fin-revenue').innerText = '$' + (fin.est_monthly_revenue || 0).toLocaleString('en-US', {minimumFractionDigits: 2});
-            document.getElementById('fin-cost').innerText = '$' + (fin.total_monthly_cost || 0).toLocaleString('en-US', {minimumFractionDigits: 2});
-            document.getElementById('fin-profit').innerText = '$' + (fin.est_monthly_net_profit || 0).toLocaleString('en-US', {minimumFractionDigits: 2});
-            document.getElementById('fin-breakeven').innerText = (fin.breakeven_months === Infinity || !fin.breakeven_months) ? 'N/A' : fin.breakeven_months + ' Months';
+            const fmt = (v) => {
+                const num = Number(v);
+                return '$' + (Number.isFinite(num) ? num : 0).toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+            };
 
-            document.getElementById('summary-text').innerText = data.summary_text || '';
-        } else {
-            alert('API Error: ' + (data.error || 'Failed to get prediction'));
+            const rev = Number(fin.est_monthly_revenue);
+            const cost = Number(fin.total_monthly_cost);
+            const profit = Number(fin.est_monthly_net_profit);
+            const be = fin.breakeven_months;
+
+            document.getElementById('res-revenue').textContent = fmt(rev);
+            document.getElementById('res-cost').textContent = fmt(cost);
+            document.getElementById('res-profit').textContent = fmt(profit);
+            document.getElementById('res-breakeven').textContent =
+                (be != null && Number.isFinite(Number(be))) ? (Number(be).toFixed(1) + ' Months') : 'N/A';
+
+            // Net profit color coding
+            const profitEl = document.getElementById('res-profit');
+            profitEl.style.color = (profit >= 0) ? 'var(--success-400)' : 'var(--danger-400)';
+
+            // Business insights
+            const traffic = Number(inputs.daily_foot_traffic) || 0;
+            const comp = Number(inputs.nearby_competitors) || 0;
+            const demand = Number(inputs.local_demand_score) || 0;
+            const rent = Number(inputs.monthly_rent) || 0;
+
+            document.getElementById('tag-traffic').textContent =
+                traffic > 12000 ? 'High' : traffic > 5000 ? 'Moderate' : 'Low';
+            document.getElementById('tag-comp').textContent =
+                comp > 8 ? 'High' : comp > 3 ? 'Moderate' : 'Low';
+            document.getElementById('tag-demand').textContent =
+                demand >= 7.0 ? 'Strong' : demand >= 4.0 ? 'Average' : 'Weak';
+            document.getElementById('tag-rent').textContent =
+                rent > 10000 ? 'High' : rent > 4000 ? 'Moderate' : 'Low';
+
+            // Colorize insight badges
+            colorizeInsight('tag-traffic', traffic > 12000 ? 'good' : traffic > 5000 ? 'neutral' : 'bad');
+            colorizeInsight('tag-comp', comp <= 3 ? 'good' : comp <= 8 ? 'neutral' : 'bad');
+            colorizeInsight('tag-demand', demand >= 7.0 ? 'good' : demand >= 4.0 ? 'neutral' : 'bad');
+            colorizeInsight('tag-rent', rent <= 4000 ? 'good' : rent <= 10000 ? 'neutral' : 'bad');
+
+            // Summary
+            document.getElementById('res-summary').textContent = data.summary_text || '';
         }
-    } catch (err) {
-        alert('API Communication Error: ' + err.message);
-    } finally {
-        btn.innerText = '⚡ Predict Store Success';
-        btn.disabled = false;
-    }
-});
-</script>
 
+        function colorizeInsight(id, level) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            if (level === 'good') el.style.color = 'var(--success-400)';
+            else if (level === 'bad') el.style.color = 'var(--danger-400)';
+            else el.style.color = 'var(--warning-400)';
+        }
+
+        /* ----------------------------------------------------------
+           What-If Slider Simulator
+           ---------------------------------------------------------- */
+        let sliderDebounce;
+
+        function onSliderChange() {
+            const rent = parseFloat(document.getElementById('slider-rent').value);
+            const traffic = parseInt(document.getElementById('slider-traffic').value, 10);
+            const comp = parseInt(document.getElementById('slider-comp').value, 10);
+
+            document.getElementById('lbl-rent').textContent = '$' + rent.toLocaleString();
+            document.getElementById('lbl-traffic').textContent = traffic.toLocaleString();
+            document.getElementById('lbl-comp').textContent = comp.toString();
+
+            clearTimeout(sliderDebounce);
+            sliderDebounce = setTimeout(async () => {
+                const loc = {
+                    population: 180000,
+                    average_monthly_income: 6500.0,
+                    daily_foot_traffic: traffic,
+                    nearby_competitors: comp,
+                    monthly_rent: rent,
+                    distance_to_mall_km: 1.2,
+                    nearby_retail_stores: 45,
+                    estimated_monthly_customers: Math.max(10, Math.round(traffic * 30 * 0.05 / 10)),
+                    average_purchase_value: 320.0,
+                    monthly_operating_cost: 7500.0,
+                    local_demand_score: 8.2,
+                    target_age_group_score: 7.5
+                };
+
+                try {
+                    const resp = await fetch('/api/predict', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'predict', model_type: selectedModel, location_data: loc })
+                    });
+                    const d = await resp.json();
+                    if (d.success !== false && Number.isFinite(Number(d.probability_percent))) {
+                        const probEl = document.getElementById('slider-prob');
+                        probEl.textContent = Number(d.probability_percent).toFixed(1) + '%';
+                        probEl.style.color = d.prediction === 'PROFITABLE' ? 'var(--success-400)' : 'var(--danger-400)';
+                    }
+                } catch (e) {
+                    /* Non-blocking background slider catch */
+                }
+            }, 250);
+        }
+
+        /* ----------------------------------------------------------
+           Live Location Comparison via /api/predict
+           ---------------------------------------------------------- */
+        async function loadComparison() {
+            const tbody = document.getElementById('comp-tbody');
+            if (!tbody) return;
+
+            try {
+                const resp = await fetch('/api/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'compare',
+                        model_type: selectedModel,
+                        locations: CANDIDATE_SITES
+                    })
+                });
+                const data = await resp.json();
+                if (data.success && Array.isArray(data.comparison)) {
+                    tbody.innerHTML = '';
+                    data.comparison.forEach(item => {
+                        const tr = document.createElement('tr');
+                        const isProf = item.Prediction === 'PROFITABLE';
+                        const prob = Number(item['Probability (%)'] || 0).toFixed(1) + '%';
+                        const cls = isProf ? 'text-success' : 'text-danger';
+                        tr.innerHTML = `
+                            <td><strong>${item.Location}</strong></td>
+                            <td>${Number(item['Foot Traffic'] || 0).toLocaleString()}/day</td>
+                            <td>${item.Competitors}</td>
+                            <td>$${Number(item['Rent ($)'] || 0).toLocaleString()}</td>
+                            <td><strong class="${cls}">${prob}</strong></td>
+                            <td><span class="${cls}">${item.Prediction}</span></td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+            } catch (err) {
+                console.warn('Live candidate comparison fetch failed:', err);
+            }
+        }
+
+        /* ----------------------------------------------------------
+           Scroll Reveal Animations (IntersectionObserver)
+           ---------------------------------------------------------- */
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.12 });
+
+        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+        // Initial live triggers on load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                onSliderChange();
+                loadComparison();
+            });
+        } else {
+            onSliderChange();
+            loadComparison();
+        }
+    </script>
 </body>
 </html>

@@ -62,7 +62,7 @@ def predict_store_success(location_data, model_type='rf'):
         prob_positive = model.predict_proba(input_df)[0][1]
         
     status = "PROFITABLE" if pred_label == 1 else "NOT PROFITABLE"
-    prob_percentage = round(prob_positive * 100, 2)
+    prob_percentage = round(float(prob_positive) * 100, 2)
     
     return {
         'prediction': status,
@@ -129,7 +129,7 @@ def financial_investment_calculator(location_data, initial_setup_cost=150000, re
     if est_monthly_net_profit > 0:
         breakeven_months = round(initial_setup_cost / est_monthly_net_profit, 1)
     else:
-        breakeven_months = float('inf')
+        breakeven_months = None  # Not profitable — break-even not applicable
         
     return {
         'est_monthly_revenue': round(est_monthly_revenue, 2),
