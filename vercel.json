@@ -3,7 +3,13 @@
   "builds": [
     {
       "src": "api/predict.py",
-      "use": "@vercel/python"
+      "use": "@vercel/python",
+      "config": {
+        "includeFiles": [
+          "models/**",
+          "src/**"
+        ]
+      }
     },
     {
       "src": "index.html",

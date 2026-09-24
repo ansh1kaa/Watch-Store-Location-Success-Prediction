@@ -426,7 +426,7 @@
                 </div>
 
                 <div class="disclaimer">
-                    Note: Both the ML model probability and financial calculator are academic decision-support estimates and do not guarantee real-world commercial profitability.
+                    Note: Both the ML model probability and financial calculator are academic decision-support estimates and do not guarantee real-world store profitability.
                 </div>
             </div>
         </div>
@@ -473,7 +473,15 @@ document.getElementById('prediction-form').addEventListener('submit', async func
             })
         });
 
-        const data = await response.json();
+        const contentType = response.headers.get('content-type') || '';
+        let data;
+        
+        if (contentType.includes('application/json')) {
+            data = await response.json();
+        } else {
+            const rawText = await response.text();
+            throw new Error(`Server returned non-JSON response (${response.status}): ${rawText.substring(0, 150)}`);
+        }
 
         if (response.ok) {
             document.getElementById('results-empty').style.display = 'none';
@@ -488,21 +496,21 @@ document.getElementById('prediction-form').addEventListener('submit', async func
                 badge.innerText = 'NOT PROFITABLE';
             }
 
-            document.getElementById('probability-value').innerText = data.probability_percent.toFixed(2) + '%';
-            document.getElementById('model-name').innerText = data.model_used;
+            document.getElementById('probability-value').innerText = (data.probability_percent || 0).toFixed(2) + '%';
+            document.getElementById('model-name').innerText = data.model_used || 'ML Classifier';
 
-            const fin = data.financial_estimates;
-            document.getElementById('fin-revenue').innerText = '$' + fin.est_monthly_revenue.toLocaleString('en-US', {minimumFractionDigits: 2});
-            document.getElementById('fin-cost').innerText = '$' + fin.total_monthly_cost.toLocaleString('en-US', {minimumFractionDigits: 2});
-            document.getElementById('fin-profit').innerText = '$' + fin.est_monthly_net_profit.toLocaleString('en-US', {minimumFractionDigits: 2});
-            document.getElementById('fin-breakeven').innerText = fin.breakeven_months === Infinity ? 'N/A' : fin.breakeven_months + ' Months';
+            const fin = data.financial_estimates || {};
+            document.getElementById('fin-revenue').innerText = '$' + (fin.est_monthly_revenue || 0).toLocaleString('en-US', {minimumFractionDigits: 2});
+            document.getElementById('fin-cost').innerText = '$' + (fin.total_monthly_cost || 0).toLocaleString('en-US', {minimumFractionDigits: 2});
+            document.getElementById('fin-profit').innerText = '$' + (fin.est_monthly_net_profit || 0).toLocaleString('en-US', {minimumFractionDigits: 2});
+            document.getElementById('fin-breakeven').innerText = (fin.breakeven_months === Infinity || !fin.breakeven_months) ? 'N/A' : fin.breakeven_months + ' Months';
 
-            document.getElementById('summary-text').innerText = data.summary_text;
+            document.getElementById('summary-text').innerText = data.summary_text || '';
         } else {
             alert('API Error: ' + (data.error || 'Failed to get prediction'));
         }
     } catch (err) {
-        alert('Network Error: ' + err.message + '\nMake sure the local API server is running.');
+        alert('API Communication Error: ' + err.message);
     } finally {
         btn.innerText = '⚡ Predict Store Success';
         btn.disabled = false;

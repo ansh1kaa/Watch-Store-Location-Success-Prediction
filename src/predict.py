@@ -8,14 +8,33 @@ import pickle
 import pandas as pd
 import numpy as np
 
-# Path to trained model artifacts in top-level models/ directory
-PROJECT_ROOT = os.path.dirname(os.path.dirname(__file__))
-MODEL_FILE = os.path.join(PROJECT_ROOT, "models", "trained_models.pkl")
+def _get_model_file_path():
+    """
+    Finds trained_models.pkl reliably across local and Vercel serverless environments.
+    """
+    possible_paths = [
+        # Strategy 1: Relative to src/
+        os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "models", "trained_models.pkl"),
+        # Strategy 2: Relative to current working directory
+        os.path.join(os.getcwd(), "models", "trained_models.pkl"),
+        # Strategy 3: Relative to api/ directory if executed from api/
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "models", "trained_models.pkl"),
+        # Strategy 4: Vercel task root
+        "/var/task/models/trained_models.pkl"
+    ]
+    
+    for path in possible_paths:
+        abs_path = os.path.abspath(path)
+        if os.path.exists(abs_path):
+            return abs_path
+            
+    raise FileNotFoundError(
+        f"Trained model artifact (trained_models.pkl) not found. Checked: {possible_paths}"
+    )
 
 def _load_artifacts():
-    if not os.path.exists(MODEL_FILE):
-        raise FileNotFoundError(f"Trained model file not found at {MODEL_FILE}. Please run train_eval.py first.")
-    with open(MODEL_FILE, "rb") as f:
+    model_path = _get_model_file_path()
+    with open(model_path, "rb") as f:
         artifacts = pickle.load(f)
     return artifacts
 

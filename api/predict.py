@@ -8,19 +8,28 @@ import json
 import os
 import sys
 
-# Ensure src directory is in Python path
+# Ensure src directory is in Python path for Vercel Serverless execution
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 SRC_DIR = os.path.join(PROJECT_ROOT, 'src')
+
 if SRC_DIR not in sys.path:
     sys.path.insert(0, SRC_DIR)
 
-from predict import (
-    predict_store_success,
-    financial_investment_calculator,
-    generate_business_summary,
-    compare_locations,
-    sensitivity_analysis
-)
+# Also add current directory to path
+if os.path.dirname(__file__) not in sys.path:
+    sys.path.insert(0, os.path.dirname(__file__))
+
+try:
+    from predict import (
+        predict_store_success,
+        financial_investment_calculator,
+        generate_business_summary,
+        compare_locations,
+        sensitivity_analysis
+    )
+except Exception as import_err:
+    predict_store_success = None
+    import_error_msg = str(import_err)
 
 class handler(BaseHTTPRequestHandler):
 
@@ -46,7 +55,15 @@ class handler(BaseHTTPRequestHandler):
         self.wfile.write(json.dumps(response).encode('utf-8'))
 
     def do_POST(self):
+        # Guarantee JSON error response for any unhandled exception
         try:
+            if predict_store_success is None:
+                self._set_headers(500)
+                self.wfile.write(json.dumps({
+                    "error": f"Import error on server: {import_error_msg}"
+                }).encode('utf-8'))
+                return
+
             content_length = int(self.headers.get('Content-Length', 0))
             post_data = self.rfile.read(content_length)
             
@@ -56,8 +73,6 @@ class handler(BaseHTTPRequestHandler):
                 return
 
             payload = json.loads(post_data.decode('utf-8'))
-            
-            # Action router: 'predict' (default), 'compare', or 'sensitivity'
             action = payload.get('action', 'predict')
 
             if action == 'compare':
@@ -84,10 +99,8 @@ class handler(BaseHTTPRequestHandler):
                 return
 
             else:
-                # Single location prediction
                 location_data = payload.get('location_data', payload)
                 
-                # Input validation: check required features
                 required_features = [
                     'population', 'average_monthly_income', 'daily_foot_traffic',
                     'nearby_competitors', 'monthly_rent', 'distance_to_mall_km',
@@ -104,7 +117,6 @@ class handler(BaseHTTPRequestHandler):
                     }).encode('utf-8'))
                     return
                 
-                # Perform ML inference & heuristics
                 model_type = payload.get('model_type', 'rf')
                 pred_result = predict_store_success(location_data, model_type=model_type)
                 fin_result = financial_investment_calculator(location_data)
